@@ -13,5 +13,19 @@
   { "id_tarea": 12, "titulo": "Filosofía ensayo", "descripcion": "Reflexión", "fecha_publicacion": "2024-05-07", "fecha_entrega": "2024-05-17", "id_curso": 12 },
   { "id_tarea": 13, "titulo": "Redes práctica", "descripcion": "Configuración", "fecha_publicacion": "2024-06-05", "fecha_entrega": "2024-06-15", "id_curso": 13 },
   { "id_tarea": 14, "titulo": "Seguridad análisis", "descripcion": "Caso práctico", "fecha_publicacion": "2024-06-06", "fecha_entrega": "2024-06-16", "id_curso": 14 },
-  { "id_tarea": 15, "titulo": "IA proyecto", "descripcion": "Mini proyecto", "fecha_publicacion": "2024-06-07", "fecha_entrega": "2024-06-20", "id_curso": 15 }
+  { "id_tarea": 15, "titulo": "IA proyecto", "descripcion": "Mini proyecto", "fecha_publicacion": "2024-06-07", "fecha_entrega": "2024-06-20", "id_curso": 15 },
+  { "id_tarea": 16, "titulo": "IA proyecto", "descripcion": "Mini proyecto", "fecha_publicacion": "2024-06-07", "fecha_entrega": "2026-04-21", "id_curso": 15 },
+  { "id_tarea": 17, "titulo": "Algoritmos práctica", "descripcion": "Ejercicios de sorting", "fecha_publicacion": "2026-04-18", "fecha_entrega": "2026-04-20", "id_curso": 15 },
+  { "id_tarea": 18, "titulo": "Base de datos ER", "descripcion": "Modelo entidad relación", "fecha_publicacion": "2026-04-18", "fecha_entrega": "2026-04-21", "id_curso": 15 },
+
+  { "id_tarea": 19, "titulo": "Frontend layout", "descripcion": "Diseñar dashboard", "fecha_publicacion": "2026-04-15", "fecha_entrega": "2026-04-22", "id_curso": 12 },
+  { "id_tarea": 20, "titulo": "API REST", "descripcion": "Crear endpoints básicos", "fecha_publicacion": "2026-04-15", "fecha_entrega": "2026-04-24", "id_curso": 12 },
+  { "id_tarea": 21, "titulo": "Testing unitario", "descripcion": "Pruebas con Jest", "fecha_publicacion": "2026-04-16", "fecha_entrega": "2026-04-26", "id_curso": 10 },
+
+  { "id_tarea": 22, "titulo": "Docker básico", "descripcion": "Contenerizar app", "fecha_publicacion": "2026-04-10", "fecha_entrega": "2026-04-28", "id_curso": 8 },
+  { "id_tarea": 23, "titulo": "Deploy app", "descripcion": "Subir a producción", "fecha_publicacion": "2026-04-12", "fecha_entrega": "2026-05-02", "id_curso": 8 },
+  { "id_tarea": 24, "titulo": "Seguridad web", "descripcion": "OWASP básico", "fecha_publicacion": "2026-04-14", "fecha_entrega": "2026-05-05", "id_curso": 9 },
+
+  { "id_tarea": 25, "titulo": "Proyecto final IA", "descripcion": "Entrega parcial", "fecha_publicacion": "2026-04-10", "fecha_entrega": "2026-05-10", "id_curso": 15 },
+  { "id_tarea": 26, "titulo": "Optimización SQL", "descripcion": "Queries avanzadas", "fecha_publicacion": "2026-04-11", "fecha_entrega": "2026-05-15", "id_curso": 11 }
 ]

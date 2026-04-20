@@ -1,5 +1,4 @@
 import { Outlet } from "react-router-dom";
-import Cursos from "./Cursos";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 

@@ -1,7 +1,7 @@
 import logo from '../assets/logo.png'
 function Login(){
     return(
-    <div className='flex justify-center w-screen h-screen items-center bg-pink-950'>
+    <div className='flex justify-center w-screen h-screen items-center bg-linear-to-b from-blue-300 to-blue-200'>
         <div className="bg-linear-to-b from-pink-950 to-pink-800 text-gray-500 w-96 md:p-6 p-4 text-left text-sm rounded-xl shadow-[0px_0px_10px_0px] shadow-black/10"
             >
             <img src={logo} className='h-30 w-30 m-auto'/>
