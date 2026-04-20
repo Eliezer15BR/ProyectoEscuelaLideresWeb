@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { FaClipboardList } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import type { Tarea } from "../types/Tarea.interface";
 
-function AccordionItem({ title, content }) {
+
+function AccordionItem({ title, content }:{title:string,content:Tarea[]}) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -29,18 +32,20 @@ function AccordionItem({ title, content }) {
             <ul>
                 {(content.length==0)?(<li className="m-2">No hay pendientes</li>)
                 : content.map(c=>(
+                    <Link to={`/curso/${c.id_curso}/tarea/${c.id_tarea}`}>
                     <li key={c.id_tarea} className="m-2 h-20 flex items-center rounded-xl">
                         <span className=" block w-4 h-full bg-pink-950 rounded-l-2xl"></span>
                         <FaClipboardList className='inline ml-5 text-4xl'/>
                         <div className="ml-4">
                             {c.titulo} <br />
                             {c.descripcion} <br />
-                            Entrega: {c.fecha_entrega}
+                            Entrega: {c.fecha_entrega.toString()}
                         </div>
                         <div className="ml-auto">
                             Curso: {c.id_curso}
                         </div>
                     </li>
+                    </Link>
                 ))
                 }
             </ul>
@@ -51,7 +56,7 @@ function AccordionItem({ title, content }) {
 }
 
 export default function Accordion() {
-    const [items,setItems]=useState([
+    const [items,setItems]=useState<[string,Tarea[]][]>([
         ["Hoy",[]],
         ["Semana",[]],
         ["Mes",[]],
@@ -64,11 +69,11 @@ export default function Accordion() {
             ])
             const pendientes=await pendientesRes.json();
             const hoy=new Date();
-            const tareasHoy=[];
-            const tareasSemana=[];
-            const tareasMes=[];
-            const otros=[];
-            pendientes.forEach(pendiente => {
+            const tareasHoy:Tarea[]=[];
+            const tareasSemana:Tarea[]=[];
+            const tareasMes:Tarea[]=[];
+            const otros:Tarea[]=[];
+            pendientes.forEach((pendiente:Tarea) => {
                 const fecha=new Date(pendiente.fecha_entrega)
                 const diffTime=fecha-hoy;
                 const diffDias=diffTime/(1000*60*60*24);

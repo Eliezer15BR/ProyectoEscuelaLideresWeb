@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { FaFileAlt } from "react-icons/fa";
 import { useParams } from "react-router-dom";
-
+import type { Tarea } from '../types/Tarea.interface'
 function Tarea(){
     const {tareaId}=useParams();
-    const [tarea,setTarea]=useState(null);
+    const [tarea,setTarea]=useState<Tarea>();
     useEffect(()=>{
         const tareaIdNum=Number(tareaId);
         fetch('/mocks/tareas.json')
         .then(res=>res.json())
-        .then(tar=>setTarea(tar.find(t=>t.id_tarea===tareaIdNum)))
+        .then((tar:Tarea[])=>setTarea(tar.find(t=>t.id_tarea===tareaIdNum)))
         .catch(e=>console.log(e))
     })
     return(
@@ -19,7 +19,7 @@ function Tarea(){
                 (  
                     <div className="p-5 flex flex-col gap-5 bg-white rounded-4xl">
                     <h1 className="font-bold text-3xl">{tarea.titulo}</h1>
-                    <p>Fecha de vencimiento: {tarea.fecha_entrega}</p>
+                    <p>Fecha de vencimiento: {tarea.fecha_entrega.toString()}</p>
                     <p>Descripcion: {tarea.descripcion}</p>
                     <div className="flex flex-col gap-5">
                         Archivos adjuntos

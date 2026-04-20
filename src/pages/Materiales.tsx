@@ -3,11 +3,14 @@ import imgCurso from '../assets/banner3.png'
 import { useEffect, useState } from 'react';
 import { MdEdit } from 'react-icons/md';
 import { FaBook, FaClipboardList } from 'react-icons/fa';
+import type { Material } from '../types/Material.interface';
+import type { Tarea } from '../types/Tarea.interface';
+import type { Curso } from '../types/Curso.interface';
 function Materiales(){
     const { id }=useParams();
-    const [curso,setCurso]=useState(null);
-    const [materiales, setMateriales]=useState([]);
-    const [tareas, setTareas]=useState([]);
+    const [curso,setCurso]=useState<Curso>();
+    const [materiales, setMateriales]=useState<Material[]>([]);
+    const [tareas, setTareas]=useState<Tarea[]>([]);
     useEffect(()=>{
             const fetchData= async()=>{
                 const [cursoRes,materialesRes,tareasRes]= await Promise.all([
@@ -19,9 +22,9 @@ function Materiales(){
             const materiales=await materialesRes.json();
             const tareas=await tareasRes.json();
             const idNum=Number(id);
-            setCurso(curso.find(c=>c.id_curso===idNum));
-            setMateriales(materiales.filter(c=>c.id_curso===idNum))
-            setTareas(tareas.filter(c=>c.id_curso===idNum))
+            setCurso(curso.find((c:Curso)=>c.id_curso===idNum));
+            setMateriales(materiales.filter((c:Curso)=>c.id_curso===idNum))
+            setTareas(tareas.filter((c:Curso)=>c.id_curso===idNum))
             }
             fetchData();
         },[id]);
@@ -52,7 +55,7 @@ function Materiales(){
                                     <FaBook className='text-5xl'/>
                                     <div>
                                         {material.titulo} <br />
-                                        {material.fecha_subida}
+                                        {material.fecha_subida.toString()}
                                     </div>
                                 </li>
                                 </Link>
@@ -64,7 +67,7 @@ function Materiales(){
                                     <div>
                                         {tarea.titulo} <br />
                                         {tarea.descripcion} <br />
-                                        {tarea.fecha_publicacion}
+                                        {tarea.fecha_publicacion.toString()}
                                     </div>
                                 </li>
                                 </Link>

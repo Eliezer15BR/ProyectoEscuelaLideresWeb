@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import { FaFileAlt } from "react-icons/fa";
 import { useParams } from "react-router-dom";
+import type { Material } from "../types/Material.interface";
 
 function Material(){
     const { materialId }=useParams();
-    const [material,setMaterial]=useState(null);
+    const [material,setMaterial]=useState<Material>();
     useEffect(()=>{
         const idNum=Number(materialId)
         fetch('/mocks/materiales.json')
         .then(res=>res.json())
-        .then(mat=>setMaterial(mat.find(m=>m.id_material===idNum)))
+        .then((mat:Material[])=>setMaterial(mat.find(m=>m.id_material===idNum)))
         .catch(e=>console.log(e))
     })
     return(
@@ -18,7 +19,7 @@ function Material(){
                 :(
                 <div className="bg-white rounded-4xl p-5 text-pink-950">
                     <h1 className="font-bold text-3xl">{material.titulo}</h1>
-                    <p className="mt-5">Fecha: {material.fecha_subida}</p>
+                    <p className="mt-5">Fecha: {material.fecha_subida.toString()}</p>
                     <p className="my-5">Esta es una descripcion del fin del material visto</p>
                     <div className="flex flex-col gap-5">
                         Archivos adjuntos
