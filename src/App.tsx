@@ -1,8 +1,22 @@
+import Login from "./pages/Login"
+import Layout from "./pages/Layout"
+import { BrowserRouter, Route, Routes } from "react-router-dom"
+import Cursos from "./pages/Cursos"
+import Materiales from "./pages/Materiales"
+
 function App() {
 
   return (
     <>
-      <h1 className="bg-amber-500">Hola mundo</h1>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login/>}/>
+        <Route path="/" element={<Layout/>}>
+          <Route index element={<Cursos/>}/>
+          <Route path="/curso/:id/materiales" element={<Materiales/>}/>
+        </Route>
+      </Routes>
+    </BrowserRouter>
     </>
   )
 }

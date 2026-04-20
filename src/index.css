@@ -1,1 +1,18 @@
 @import "tailwindcss";
+.bg-main{
+    background-color: #8a2f63;
+}
+.bg-secondary{
+    background-color: #b996c5;
+}
+.bg-dark{
+    background-color: #4b0f3f;
+}
+.btn-animated{
+    transition: all;
+    transition-duration: 300ms;
+}
+.btn-animated:hover{
+    transform: scale(1.05);
+    transition-duration: 300ms;
+}

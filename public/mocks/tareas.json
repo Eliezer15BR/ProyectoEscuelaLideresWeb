@@ -1,0 +1,17 @@
+[
+  { "id_tarea": 1, "titulo": "Ejercicios Álgebra", "descripcion": "Resolver problemas", "fecha_publicacion": "2024-02-05", "fecha_entrega": "2024-02-15", "id_curso": 1 },
+  { "id_tarea": 2, "titulo": "Problemas Física", "descripcion": "Resolver ejercicios", "fecha_publicacion": "2024-02-06", "fecha_entrega": "2024-02-16", "id_curso": 2 },
+  { "id_tarea": 3, "titulo": "Laboratorio Química", "descripcion": "Informe", "fecha_publicacion": "2024-02-07", "fecha_entrega": "2024-02-17", "id_curso": 3 },
+  { "id_tarea": 4, "titulo": "Ensayo Historia", "descripcion": "Escribir ensayo", "fecha_publicacion": "2024-03-05", "fecha_entrega": "2024-03-15", "id_curso": 4 },
+  { "id_tarea": 5, "titulo": "Proyecto JS", "descripcion": "App simple", "fecha_publicacion": "2024-03-06", "fecha_entrega": "2024-03-20", "id_curso": 5 },
+  { "id_tarea": 6, "titulo": "Consulta SQL", "descripcion": "Queries básicas", "fecha_publicacion": "2024-03-07", "fecha_entrega": "2024-03-21", "id_curso": 6 },
+  { "id_tarea": 7, "titulo": "Inglés tarea", "descripcion": "Ejercicios", "fecha_publicacion": "2024-04-05", "fecha_entrega": "2024-04-15", "id_curso": 7 },
+  { "id_tarea": 8, "titulo": "Economía análisis", "descripcion": "Resumen", "fecha_publicacion": "2024-04-06", "fecha_entrega": "2024-04-16", "id_curso": 8 },
+  { "id_tarea": 9, "titulo": "Biología reporte", "descripcion": "Investigación", "fecha_publicacion": "2024-04-07", "fecha_entrega": "2024-04-17", "id_curso": 9 },
+  { "id_tarea": 10, "titulo": "Arte dibujo", "descripcion": "Dibujo libre", "fecha_publicacion": "2024-05-05", "fecha_entrega": "2024-05-15", "id_curso": 10 },
+  { "id_tarea": 11, "titulo": "Mapa geografía", "descripcion": "Mapa físico", "fecha_publicacion": "2024-05-06", "fecha_entrega": "2024-05-16", "id_curso": 11 },
+  { "id_tarea": 12, "titulo": "Filosofía ensayo", "descripcion": "Reflexión", "fecha_publicacion": "2024-05-07", "fecha_entrega": "2024-05-17", "id_curso": 12 },
+  { "id_tarea": 13, "titulo": "Redes práctica", "descripcion": "Configuración", "fecha_publicacion": "2024-06-05", "fecha_entrega": "2024-06-15", "id_curso": 13 },
+  { "id_tarea": 14, "titulo": "Seguridad análisis", "descripcion": "Caso práctico", "fecha_publicacion": "2024-06-06", "fecha_entrega": "2024-06-16", "id_curso": 14 },
+  { "id_tarea": 15, "titulo": "IA proyecto", "descripcion": "Mini proyecto", "fecha_publicacion": "2024-06-07", "fecha_entrega": "2024-06-20", "id_curso": 15 }
+]

@@ -1,0 +1,17 @@
+[
+  { "id_material": 1, "titulo": "PDF Álgebra", "fecha_subida": "2024-02-02", "id_curso": 1 },
+  { "id_material": 2, "titulo": "Guía Física", "fecha_subida": "2024-02-03", "id_curso": 2 },
+  { "id_material": 3, "titulo": "Apuntes Química", "fecha_subida": "2024-02-04", "id_curso": 3 },
+  { "id_material": 4, "titulo": "Historia PDF", "fecha_subida": "2024-03-02", "id_curso": 4 },
+  { "id_material": 5, "titulo": "JS Básico", "fecha_subida": "2024-03-03", "id_curso": 5 },
+  { "id_material": 6, "titulo": "SQL Intro", "fecha_subida": "2024-03-04", "id_curso": 6 },
+  { "id_material": 7, "titulo": "Inglés A1", "fecha_subida": "2024-04-02", "id_curso": 7 },
+  { "id_material": 8, "titulo": "Economía PDF", "fecha_subida": "2024-04-03", "id_curso": 8 },
+  { "id_material": 9, "titulo": "Bio Celular", "fecha_subida": "2024-04-04", "id_curso": 9 },
+  { "id_material": 10, "titulo": "Arte Guía", "fecha_subida": "2024-05-02", "id_curso": 10 },
+  { "id_material": 11, "titulo": "Geo Mapas", "fecha_subida": "2024-05-03", "id_curso": 11 },
+  { "id_material": 12, "titulo": "Filosofía PDF", "fecha_subida": "2024-05-04", "id_curso": 12 },
+  { "id_material": 13, "titulo": "Redes Intro", "fecha_subida": "2024-06-02", "id_curso": 13 },
+  { "id_material": 14, "titulo": "Seguridad PDF", "fecha_subida": "2024-06-03", "id_curso": 14 },
+  { "id_material": 15, "titulo": "IA Intro", "fecha_subida": "2024-06-04", "id_curso": 15 }
+]
