@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import imgCurso from '../assets/banner3.png'
 import { Link } from 'react-router-dom';
 import type { CursoEntity } from '../types/CursoEntity.interface';
+import Navbar from '../components/Navbar';
 function Cursos(){
     const [cursos, setCursos]=useState<CursoEntity[]>([]);
     useEffect(()=>{
@@ -11,6 +12,9 @@ function Cursos(){
         .catch(err=>console.error(err));
     },[]);
     return(
+        <div className='ml-70'>
+            <Navbar titulo="Cursos"/>
+            <main>
         <div className="grid grid-cols-2 p-10 w-full gap-10">
             {
                 (cursos.length!=0)
@@ -37,6 +41,8 @@ function Cursos(){
             }
             
             
+        </div>
+        </main>
         </div>
     )
 }

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { FaFileAlt } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import type { MaterialEntity } from "../types/MaterialEntity.interface";
+import Navbar from "../components/Navbar";
 
 function Material(){
     const { materialId }=useParams();
@@ -14,6 +15,9 @@ function Material(){
         .catch(e=>console.log(e))
     })
     return(
+        <div className="ml-70">
+            <Navbar titulo="Material"/>
+            <main>
         <section className="p-10">
             {(!material)?(<div> No se ha encontrado el material</div>)
                 :(
@@ -37,6 +41,8 @@ function Material(){
                 )
             }
         </section>
+        </main>
+        </div>
     );
 }
 export default Material;

@@ -6,6 +6,7 @@ import { FaBook, FaClipboardList } from 'react-icons/fa';
 import type { MaterialEntity } from '../types/MaterialEntity.interface';
 import type { TareaEntity } from '../types/TareaEntity.interface';
 import type { CursoEntity } from '../types/CursoEntity.interface';
+import Navbar from '../components/Navbar';
 function Materiales(){
     const { id }=useParams();
     const [curso,setCurso]=useState<CursoEntity>();
@@ -29,7 +30,10 @@ function Materiales(){
             fetchData();
         },[id]);
     return(
-        <>  {(!curso)
+        <div className='ml-70'>
+            <Navbar titulo="Contenido" />
+            <main>
+        {(!curso)
             ? (<h1 className='font-bold text-pink-950'>Curso no encontrado</h1>)
             : (
                 <div className='p-5 flex flex-col'>
@@ -77,8 +81,8 @@ function Materiales(){
                     }
                 </div>
             )}
-            
-        </>
+            </main>  
+        </div>
     )
 }
 export default Materiales;

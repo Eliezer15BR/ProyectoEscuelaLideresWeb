@@ -1,18 +1,22 @@
 import { useEffect, useState } from "react";
 import { FaFileAlt } from "react-icons/fa";
 import { useParams } from "react-router-dom";
-import type { Tarea } from '../types/TareaEntity.interface'
+import type { TareaEntity } from '../types/TareaEntity.interface'
+import Navbar from "../components/Navbar";
 function Tarea(){
     const {tareaId}=useParams();
-    const [tarea,setTarea]=useState<Tarea>();
+    const [tarea,setTarea]=useState<TareaEntity>();
     useEffect(()=>{
         const tareaIdNum=Number(tareaId);
         fetch('/mocks/tareas.json')
         .then(res=>res.json())
-        .then((tar:Tarea[])=>setTarea(tar.find(t=>t.id_tarea===tareaIdNum)))
+        .then((tar:TareaEntity[])=>setTarea(tar.find(t=>t.id_tarea===tareaIdNum)))
         .catch(e=>console.log(e))
     })
     return(
+        <div className="ml-70">
+            <Navbar titulo="Tarea"/>
+            <main>
         <section className="p-10">
             {(!tarea)?(<div>Tarea no encontrada</div>)
                 :
@@ -58,6 +62,8 @@ function Tarea(){
             }
             
         </section>
+        </main>
+        </div>
     );
 }
 export default Tarea;
