@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { FaFileAlt } from "react-icons/fa";
 import { useParams } from "react-router-dom";
-import type { Tarea } from '../types/Tarea.interface'
+import type { Tarea } from '../types/TareaEntity.interface'
 function Tarea(){
     const {tareaId}=useParams();
     const [tarea,setTarea]=useState<Tarea>();

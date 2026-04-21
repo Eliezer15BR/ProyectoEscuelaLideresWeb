@@ -1,4 +1,4 @@
-export interface Usuario{
+export interface UsuarioEntity{
     id_usuario:number;
     nombre:string;
     correo:string;

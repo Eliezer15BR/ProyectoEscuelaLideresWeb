@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { FaClipboardList } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import type { Tarea } from "../types/Tarea.interface";
+import type { TareaEntity } from "../types/TareaEntity.interface";
 
 
-function AccordionItem({ title, content }:{title:string,content:Tarea[]}) {
+function AccordionItem({ title, content }:{title:string,content:TareaEntity[]}) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -56,7 +56,7 @@ function AccordionItem({ title, content }:{title:string,content:Tarea[]}) {
 }
 
 export default function Accordion() {
-    const [items,setItems]=useState<[string,Tarea[]][]>([
+    const [items,setItems]=useState<[string,TareaEntity[]][]>([
         ["Hoy",[]],
         ["Semana",[]],
         ["Mes",[]],
@@ -69,11 +69,11 @@ export default function Accordion() {
             ])
             const pendientes=await pendientesRes.json();
             const hoy=new Date();
-            const tareasHoy:Tarea[]=[];
-            const tareasSemana:Tarea[]=[];
-            const tareasMes:Tarea[]=[];
-            const otros:Tarea[]=[];
-            pendientes.forEach((pendiente:Tarea) => {
+            const tareasHoy:TareaEntity[]=[];
+            const tareasSemana:TareaEntity[]=[];
+            const tareasMes:TareaEntity[]=[];
+            const otros:TareaEntity[]=[];
+            pendientes.forEach((pendiente:TareaEntity) => {
                 const fecha=new Date(pendiente.fecha_entrega)
                 const diffTime=fecha-hoy;
                 const diffDias=diffTime/(1000*60*60*24);

@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { FaEdit, FaHome } from "react-icons/fa";
 import { IoIosLogOut } from "react-icons/io";
 import { Link } from "react-router-dom";
-import type { Usuario } from "../types/Usuario.interface";
+import type { UsuarioEntity } from "../types/UsuarioEntity.interface";
 
 function Admin(){
-    const [usuarios,setUsuarios]=useState<Usuario[]>([]);
-    const [usuariosFiltrados,setUsuariosFiltrados]=useState<Usuario[]>([]);
+    const [usuarios,setUsuarios]=useState<UsuarioEntity[]>([]);
+    const [usuariosFiltrados,setUsuariosFiltrados]=useState<UsuarioEntity[]>([]);
     const [busqueda, setBusqueda]=useState('');
     const handleBuscar=()=>{
         const resultado=usuarios.filter(u=>

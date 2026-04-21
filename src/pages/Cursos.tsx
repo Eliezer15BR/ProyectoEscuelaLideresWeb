@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import imgCurso from '../assets/banner3.png'
 import { Link } from 'react-router-dom';
-import type { Curso } from '../types/Curso.interface';
+import type { CursoEntity } from '../types/CursoEntity.interface';
 function Cursos(){
-    const [cursos, setCursos]=useState<Curso[]>([]);
+    const [cursos, setCursos]=useState<CursoEntity[]>([]);
     useEffect(()=>{
         fetch('/mocks/cursos.json')
         .then((res)=>res.json())

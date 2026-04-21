@@ -3,14 +3,14 @@ import imgCurso from '../assets/banner3.png'
 import { useEffect, useState } from 'react';
 import { MdEdit } from 'react-icons/md';
 import { FaBook, FaClipboardList } from 'react-icons/fa';
-import type { Material } from '../types/Material.interface';
-import type { Tarea } from '../types/Tarea.interface';
-import type { Curso } from '../types/Curso.interface';
+import type { MaterialEntity } from '../types/MaterialEntity.interface';
+import type { TareaEntity } from '../types/TareaEntity.interface';
+import type { CursoEntity } from '../types/CursoEntity.interface';
 function Materiales(){
     const { id }=useParams();
-    const [curso,setCurso]=useState<Curso>();
-    const [materiales, setMateriales]=useState<Material[]>([]);
-    const [tareas, setTareas]=useState<Tarea[]>([]);
+    const [curso,setCurso]=useState<CursoEntity>();
+    const [materiales, setMateriales]=useState<MaterialEntity[]>([]);
+    const [tareas, setTareas]=useState<TareaEntity[]>([]);
     useEffect(()=>{
             const fetchData= async()=>{
                 const [cursoRes,materialesRes,tareasRes]= await Promise.all([
@@ -22,9 +22,9 @@ function Materiales(){
             const materiales=await materialesRes.json();
             const tareas=await tareasRes.json();
             const idNum=Number(id);
-            setCurso(curso.find((c:Curso)=>c.id_curso===idNum));
-            setMateriales(materiales.filter((c:Curso)=>c.id_curso===idNum))
-            setTareas(tareas.filter((c:Curso)=>c.id_curso===idNum))
+            setCurso(curso.find((c:CursoEntity)=>c.id_curso===idNum));
+            setMateriales(materiales.filter((c:CursoEntity)=>c.id_curso===idNum))
+            setTareas(tareas.filter((c:CursoEntity)=>c.id_curso===idNum))
             }
             fetchData();
         },[id]);

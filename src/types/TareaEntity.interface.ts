@@ -1,4 +1,4 @@
-export interface Tarea{
+export interface TareaEntity{
     id_tarea:number;
     titulo:string;
     descripcion:string;

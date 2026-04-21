@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 import { FaFileAlt } from "react-icons/fa";
 import { useParams } from "react-router-dom";
-import type { Material } from "../types/Material.interface";
+import type { MaterialEntity } from "../types/MaterialEntity.interface";
 
 function Material(){
     const { materialId }=useParams();
-    const [material,setMaterial]=useState<Material>();
+    const [material,setMaterial]=useState<MaterialEntity>();
     useEffect(()=>{
         const idNum=Number(materialId)
         fetch('/mocks/materiales.json')
         .then(res=>res.json())
-        .then((mat:Material[])=>setMaterial(mat.find(m=>m.id_material===idNum)))
+        .then((mat:MaterialEntity[])=>setMaterial(mat.find(m=>m.id_material===idNum)))
         .catch(e=>console.log(e))
     })
     return(

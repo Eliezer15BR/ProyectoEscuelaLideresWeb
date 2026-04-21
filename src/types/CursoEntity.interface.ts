@@ -1,4 +1,4 @@
-export interface Curso{
+export interface CursoEntity{
     id_curso:number;
     id_usuario:number;
     cupos:number;
