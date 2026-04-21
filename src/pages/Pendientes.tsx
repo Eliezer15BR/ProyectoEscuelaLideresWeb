@@ -4,7 +4,7 @@ import Navbar from "../components/Navbar";
 function Pendientes(){
     return(
     <>
-        <div className="ml-70">
+        <div className="md:ml-70 ml-42">
             <Navbar titulo="Pendientes"/>
             <main>
             <Accordion></Accordion>

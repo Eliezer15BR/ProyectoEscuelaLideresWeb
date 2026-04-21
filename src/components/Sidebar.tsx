@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 function Sidebar(){
     return (
         <>
-            <nav className="flex w-70 bg-white fixed h-screen flex-col rounded-tr-2xl rounded-br-2xl">
+            <nav className="flex w-50 bg-white fixed h-screen flex-col rounded-tr-2xl rounded-br-2xl md:w-70">
                 <div className=' rounded-tr-2xl bg-linear-to-b from-pink-950 to-pink-800'>
                     <Link to="/perfil"><FaCircleUser className='h-15 w-15 text-white m-4'/></Link>
                     <div className="flex-col flex py-3 px-4" >

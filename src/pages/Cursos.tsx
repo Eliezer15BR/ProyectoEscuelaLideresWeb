@@ -12,10 +12,10 @@ function Cursos(){
         .catch(err=>console.error(err));
     },[]);
     return(
-        <div className='ml-70'>
+        <div className='md:ml-70 ml-42'>
             <Navbar titulo="Cursos"/>
             <main>
-        <div className="grid grid-cols-2 p-10 w-full gap-10">
+        <div className="grid md:grid-cols-2 grid-cols-1 p-10 w-full gap-10">
             {
                 (cursos.length!=0)
                 ?   cursos.map((curso)=>(

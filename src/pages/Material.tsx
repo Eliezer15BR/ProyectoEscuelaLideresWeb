@@ -15,7 +15,7 @@ function Material(){
         .catch(e=>console.log(e))
     })
     return(
-        <div className="ml-70">
+        <div className="md:ml-70 ml-42">
             <Navbar titulo="Material"/>
             <main>
         <section className="p-10">

@@ -6,6 +6,10 @@ import Navbar from "../components/Navbar";
 function Tarea(){
     const {tareaId}=useParams();
     const [tarea,setTarea]=useState<TareaEntity>();
+    const [archivos, setArchivos]=useState([]);
+    const eliminarArchivo=(index)=>{
+        setArchivos(prev=>prev.filter((_,i)=>i!==index));
+    }
     useEffect(()=>{
         const tareaIdNum=Number(tareaId);
         fetch('/mocks/tareas.json')
@@ -14,7 +18,7 @@ function Tarea(){
         .catch(e=>console.log(e))
     })
     return(
-        <div className="ml-70">
+        <div className="md:ml-70 ml-42">
             <Navbar titulo="Tarea"/>
             <main>
         <section className="p-10">
@@ -45,7 +49,27 @@ function Tarea(){
                             </svg>
                             <p className="text-gray-500">Drag files here to upload</p>
                             <p className="text-gray-400">Or <span className="text-blue-500 underline">click here</span> to select a file</p>
-                            <input id="fileInput" type="file" className="hidden" />
+                            <input id="fileInput" type="file" className="hidden" 
+                            multiple
+                            onChange={(e)=>{
+                                const files=Array.from(e.target.files);
+                                setArchivos(prev=>[...prev,...files]);
+                            }}
+                            />
+                            {
+                                archivos.length>0 && (
+                                    <div className="mt-4 flex flex-col gap-2">
+                                        {
+                                            archivos.map((file,index)=>(
+                                                <div key={index} className="p-2 bg-gray-100 rounded">
+                                                    <span>{file.name}</span>
+                                                    <button onClick={()=>eliminarArchivo(index)}>❌</button>
+                                                </div>
+                                            ))
+                                        }
+                                    </div>
+                                )
+                            }
                         </label>
                     
                         <div className="mt-6 flex flex-col justify-end gap-4">
