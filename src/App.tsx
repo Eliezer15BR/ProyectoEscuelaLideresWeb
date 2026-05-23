@@ -1,34 +1,51 @@
-import Login from "./pages/Login"
-import Layout from "./components/Layout"
-import { BrowserRouter, Route, Routes } from "react-router-dom"
-import Cursos from "./pages/Cursos"
-import Materiales from "./pages/Materiales"
-import Perfil from "./pages/Perfil"
-import Admin from "./pages/Admin"
-import Pendientes from "./pages/Pendientes"
-import Material from "./pages/Material"
-import Tarea from "./pages/Tarea"
+// src/App.tsx
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuthStore } from './store/authStore';
+import { LoginScreen } from './features/auth/LoginScreen';
+import { Layout } from './components/Layout';
+import { CourseListScreen } from './features/courses/CourseListScreen';
+import { ProtectedRoute } from './routes/ProtectedRoute';
+import { CourseDetailScreen } from './features/courses/CourseDetailScreen';
 
-function App() {
+export const App = () => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   return (
-    <>
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<Login/>}/>
-        <Route path="/" element={<Layout/>}>
-          <Route index element={<Cursos/>}/>
-          <Route path="/curso/:id/materiales" element={<Materiales/>}/>
-          <Route path="/curso/:cursoId/material/:materialId" element={<Material/>}/>
-          <Route path="/curso/:cursoId/tarea/:tareaId" element={<Tarea/>}/>
-          <Route path="/pendientes" element={<Pendientes/>}/>
-        </Route>
-        <Route path="/perfil" element={<Perfil/>}/>
-        <Route path="/admin" element={<Admin/>}/>
+        
+        <Route 
+          path="/" 
+          element={
+            isAuthenticated ? <Navigate to="/clases" replace /> : <LoginScreen />
+          } 
+        />
+
+        <Route
+          path="/clases"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <CourseListScreen />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+          <Route
+            path='/clases/:id'
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <CourseDetailScreen />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+        <Route path="*" element={<Navigate to="/" replace />} />
+
       </Routes>
     </BrowserRouter>
-    </>
-  )
-}
+  );
+};
 
-export default App
+export default App;

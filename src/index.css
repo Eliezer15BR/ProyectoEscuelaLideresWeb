@@ -1,5 +1,29 @@
 @import "tailwindcss";
-.bg-main{
+
+/* 1. Declaramos tu paleta de Flutter para que Tailwind la absorba */
+@theme {
+  /* Paleta principal */
+  --color-primary-dark: #4B0F3F;
+  --color-primary: #8A2F63;
+  --color-secondary: #B996C5;
+  --color-background-light: #B7D9F6;
+  --color-accent: #7C8FD9;
+
+  /* Colores neutrales */
+  --color-surface-white: #FFFFFF;
+  --color-text-primary: #1A1A1A;
+  --color-text-secondary: #757575;
+  --color-error: #D32F2F;
+}
+
+/* 2. Clases personalizadas (como tus animaciones) */
+@layer utilities {
+  .btn-animated {
+    /* Usamos @apply para inyectar la potencia de Tailwind sin escribir CSS tradicional */
+    @apply transition-all duration-300 hover:scale-105;
+  }
+}
+/* .bg-main{
     background-color: #8a2f63;
 }
 .bg-secondary{
@@ -8,6 +32,7 @@
 .bg-dark{
     background-color: #4b0f3f;
 }
+.bg-light
 .btn-animated{
     transition: all;
     transition-duration: 300ms;
@@ -15,4 +40,4 @@
 .btn-animated:hover{
     transform: scale(1.05);
     transition-duration: 300ms;
-}
+} */
