@@ -5,7 +5,16 @@ import { entregaService } from './services/entregaService';
 import { Button } from '../../components/Button';
 
 // --- EL MINI-COMPONENTE VIVE AQUÍ AHORA ---
-const SubmissionCard = ({ entrega, onCalificar }: { entrega: any, onCalificar: (id: number, nota: number, comentario: string) => Promise<void> }) => {
+// --- COMPONENTE TARJETA DE CALIFICACIÓN ---
+const SubmissionCard = ({ 
+  entrega, 
+  onCalificar, 
+  onAnular 
+}: { 
+  entrega: any; 
+  onCalificar: (id: number, nota: number, comentario: string) => Promise<void>;
+  onAnular: (id: number) => Promise<void>; 
+}) => {
   const [nota, setNota] = useState<number | ''>(entrega.calificacion ?? '');
   const [comentario, setComentario] = useState(entrega.comentario_profesor || '');
   const [isSaving, setIsSaving] = useState(false);
@@ -19,6 +28,17 @@ const SubmissionCard = ({ entrega, onCalificar }: { entrega: any, onCalificar: (
     await onCalificar(entrega.id || entrega.id_entrega, Number(nota), comentario);
     setIsSaving(false);
   };
+
+  const handleReset = async () => {
+    const confirmacion = window.confirm('¿Anular la calificación? La tarea volverá a estar pendiente.');
+    if (!confirmacion) return;
+    setIsSaving(true);
+    await onAnular(entrega.id || entrega.id_entrega);
+    setNota(''); // Limpiamos el input local
+    setComentario(''); // Limpiamos el comentario local
+    setIsSaving(false);
+  };
+
   return (
     <div className={`p-6 rounded-2xl border transition-all ${isGraded ? 'bg-green-50/20 border-green-200' : 'bg-surface-white border-gray-200 shadow-sm'}`}>
       <div className="flex justify-between items-start flex-wrap gap-4 mb-4">
@@ -28,7 +48,7 @@ const SubmissionCard = ({ entrega, onCalificar }: { entrega: any, onCalificar: (
             {isGraded && <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full uppercase tracking-widest">Calificado</span>}
           </h3>
           <p className="text-xs text-text-secondary mt-1">
-            Última actualización: {new Date(entrega.fecha_entrega  || new Date()).toLocaleString('es-ES')}
+            Última actualización: {new Date(entrega.updatedAt || entrega.createdAt || new Date()).toLocaleString('es-ES')}
           </p>
         </div>
         
@@ -51,19 +71,37 @@ const SubmissionCard = ({ entrega, onCalificar }: { entrega: any, onCalificar: (
           <input 
             type="number" min="0" max="100" 
             value={nota} onChange={(e) => setNota(e.target.value ? Number(e.target.value) : '')}
-            className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-text-primary font-bold text-center focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+            disabled={isSaving}
+            className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-text-primary font-bold text-center focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary disabled:opacity-50"
           />
         </div>
         <div className="flex-1 w-full min-w-[200px]">
           <label className="block text-xs font-bold text-text-secondary mb-1">Comentario / Feedback</label>
           <textarea 
             value={comentario} onChange={(e) => setComentario(e.target.value)}
-            className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-text-primary text-sm focus:outline-none focus:border-primary resize-none h-10"
+            disabled={isSaving}
+            className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-text-primary text-sm focus:outline-none focus:border-primary resize-none h-10 disabled:opacity-50"
             placeholder="Feedback para el alumno..."
           />
         </div>
-        <div className="w-full lg:w-32 self-end">
-          <Button onClick={handleSave} isLoading={isSaving} fullWidth>Guardar</Button>
+        
+        {/* ZONA DE BOTONES */}
+        <div className="w-full lg:w-auto self-end flex items-center gap-2 mt-2 lg:mt-0">
+          {isGraded && (
+            <button 
+              onClick={handleReset} 
+              disabled={isSaving}
+              title="Anular calificación"
+              className="p-2 border border-red-200 text-red-500 hover:bg-red-50 rounded-xl transition-colors disabled:opacity-50"
+            >
+              🗑️
+            </button>
+          )}
+          <div className="w-full lg:w-32">
+            <Button onClick={handleSave} isLoading={isSaving} fullWidth>
+              {isGraded ? 'Actualizar' : 'Guardar'}
+            </Button>
+          </div>
         </div>
       </div>
     </div>
@@ -108,7 +146,16 @@ export const RevisionesScreen = () => {
       alert('Error al guardar la calificación.');
     }
   };
-
+  const handleAnularCalificacion = async (entregaId: number) => {
+    try {
+      await entregaService.anularCalificacion(entregaId);
+      // Refrescamos la lista global para que el cambio se refleje
+      const dataEntregas = await entregaService.getAllByTarea(Number(taskId));
+      setEntregas(dataEntregas || []);
+    } catch (error) {
+      alert('Error al anular la calificación. Revisa tu conexión.');
+    }
+  };
   if (isLoading) return <div className="flex justify-center p-12"><div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div></div>;
 
   return (
@@ -138,7 +185,8 @@ export const RevisionesScreen = () => {
             <SubmissionCard 
               key={entregaItem.id || entregaItem.id_entrega} 
               entrega={entregaItem} 
-              onCalificar={handleCalificar} 
+              onCalificar={handleCalificar}
+              onAnular={handleAnularCalificacion}
             />
           ))
         )}

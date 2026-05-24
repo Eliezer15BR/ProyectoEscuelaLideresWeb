@@ -36,7 +36,7 @@ export const TareaDetailScreen = () => {
 
   // 💡 LA SOLUCIÓN: Validamos si realmente hay una entrega activa inspeccionando sus IDs reales
   const tieneEntregaActiva = !!(entrega?.id || entrega?.id_entrega);
-
+    const isCalificada = entrega?.calificacion !== null && entrega?.calificacion !== undefined;
   const formatForInput = (isoString?: string) => {
     if (!isoString) return '';
     const date = new Date(isoString);
@@ -345,16 +345,19 @@ export const TareaDetailScreen = () => {
       {/* --- SECCIÓN: MI TRABAJO (SOLO ESTUDIANTES) --- */}
       {isEstudiante && (
         <div className="bg-surface-white rounded-2xl p-8 border border-gray-100 shadow-md relative overflow-hidden">
+          
           <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
             <div className="flex items-center gap-3">
               <h2 className="text-xl font-bold text-text-primary">Mi Trabajo</h2>
               <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${
-                tieneEntregaActiva ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                isCalificada ? 'bg-orange-100 text-orange-700' : (tieneEntregaActiva ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500')
               }`}>
-                {tieneEntregaActiva ? '✅ Entregado' : '⏳ Pendiente'}
+                {isCalificada ? '🏅 Calificado' : (tieneEntregaActiva ? '✅ Entregado' : '⏳ Pendiente')}
               </span>
             </div>
-            {tieneEntregaActiva && !isOverdue && (
+            
+            {/* Solo se puede anular si está entregado, no ha vencido, Y NO HA SIDO CALIFICADO */}
+            {tieneEntregaActiva && !isOverdue && !isCalificada && (
               <button
                 onClick={handleCancelarEntrega}
                 disabled={isSubiendoAlumno}
@@ -365,18 +368,38 @@ export const TareaDetailScreen = () => {
             )}
           </div>
 
+          {/* EL VEREDICTO DEL PROFESOR */}
+          {isCalificada && (
+            <div className="mb-8 p-6 bg-orange-50/50 border border-orange-100 rounded-xl">
+              <h3 className="text-xs font-bold text-orange-600 uppercase tracking-wider mb-4">Calificación del Profesor</h3>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+                <div className="flex flex-col items-center justify-center p-4 bg-white rounded-xl border border-orange-200 min-w-[120px] shadow-sm">
+                  <span className="text-4xl font-extrabold text-orange-600">{entrega.calificacion}</span>
+                  <span className="text-xs font-bold text-text-secondary mt-1">/ 100 pts</span>
+                </div>
+                {entrega.comentario_profesor && (
+                  <div className="flex-1 bg-white p-4 rounded-xl border border-gray-100 shadow-sm relative">
+                    <span className="absolute -top-3 left-4 bg-white px-2 text-xl">💬</span>
+                    <p className="text-sm text-text-primary italic mt-1">{entrega.comentario_profesor}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {tieneEntregaActiva && archivosEntrega.length > 0 && (
             <div className="space-y-3 mb-4">
               {archivosEntrega.map((archivo) => (
-                <div key={archivo.id} className="flex items-center justify-between p-4 border border-green-100 rounded-xl bg-green-50/30">
+                <div key={archivo.id} className="flex items-center justify-between p-4 border border-gray-100 rounded-xl bg-gray-50/50">
                   <div className="flex items-center gap-3 min-w-0 pr-4">
                     <span className="text-xl">📄</span>
                     <span className="text-sm font-medium text-text-primary truncate">{archivo.nombre_archivo}</span>
                   </div>
                   <div className="flex items-center gap-2">
                      <a href={archivo.url} target="_blank" rel="noreferrer" className="px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-bold text-text-primary hover:bg-gray-50 transition-colors">Ver</a>
-                     {!isOverdue && (
-                       <button onClick={() => handleEliminarArchivoAlumno(archivo.id_archivo)} className="text-red-400 hover:text-red-600 p-1 transition-colors">✕</button>
+                     {/* Se oculta el botón de borrar archivo si ya está calificado */}
+                     {!isOverdue && !isCalificada && (
+                       <button onClick={() => handleEliminarArchivoAlumno(archivo.id)} className="text-red-400 hover:text-red-600 p-1 transition-colors">✕</button>
                      )}
                   </div>
                 </div>
@@ -385,7 +408,12 @@ export const TareaDetailScreen = () => {
           )}
 
           <div className="mt-6 pt-6 border-t border-gray-100">
-            {isOverdue && !tieneEntregaActiva ? (
+            {/* Si ya está calificada, mostramos un mensaje de cierre en vez del form de subida */}
+            {isCalificada ? (
+              <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl text-text-secondary text-sm font-medium text-center">
+                Esta tarea ya fue evaluada. El buzón de entrega está cerrado.
+              </div>
+            ) : isOverdue && !tieneEntregaActiva ? (
               <div className="p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm font-medium text-center">
                 La fecha límite ha pasado. No puedes realizar entregas.
               </div>

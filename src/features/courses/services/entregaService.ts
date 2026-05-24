@@ -50,5 +50,12 @@ export const entregaService = {
   calificar: async (entregaId: number, data: { calificacion: number; comentario_profesor?: string }) => {
     const response = await apiClient.patch(`/entrega/${entregaId}`, data);
     return response.data;
+  },
+  anularCalificacion: async (entregaId: number) => {
+    const response = await apiClient.patch(`/entrega/${entregaId}`, {
+      calificacion: null,
+      comentario_profesor: null
+    });
+    return response.data;
   }
 };
