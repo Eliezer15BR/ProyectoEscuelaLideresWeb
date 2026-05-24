@@ -38,5 +38,10 @@ export const tareaService = {
 
   deleteFile: async (fileId: number) => {
     await apiClient.delete(`/archivo-tarea/${fileId}`);
-  }
+  },
+  // NUEVO: Traer todas las tareas pendientes globales del estudiante
+  getPendientes: async () => {
+    const response = await apiClient.get('/tarea/pendientes');
+    return response.data;
+  },
 };

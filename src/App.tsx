@@ -11,6 +11,8 @@ import { ProfileScreen } from './features/profile/ProfileScreen';
 import { MaterialDetailScreen } from './features/courses/MaterialDetailScreen';
 import { TareaDetailScreen } from './features/courses/TareaDetailScreen';
 import { RevisionesScreen } from './features/courses/RevisionesScreen';
+import { PendientesScreen } from './features/courses/PendientesScreen';
+import { UsuariosScreen } from './features/admin/UsuariosScreen';
 
 export const App = () => {
   const { isAuthenticated, checkAuth, isCheckingAuth } = useAuthStore();
@@ -78,6 +80,16 @@ export const App = () => {
         <Route path="/clases/:id/tarea/:taskId/revisiones" element={
           <ProtectedRoute allowedRoles={['Admin', 'Profesor']}>
             <Layout><RevisionesScreen /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/pendientes" element={
+          <ProtectedRoute allowedRoles={['Estudiante']}>
+            <Layout><PendientesScreen /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/usuarios" element={
+          <ProtectedRoute allowedRoles={['Admin']}>
+            <Layout><UsuariosScreen /></Layout>
           </ProtectedRoute>
         } />
         {/* RUTA COMODÍN */}
