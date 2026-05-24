@@ -1,21 +1,19 @@
 // src/features/courses/CourseDetailScreen.tsx
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCourseStore } from './hooks/useCourseStore';
-import { Card } from '../../components/Card';
 import { Button } from '../../components/Button';
 import { CourseFeed } from './CourseFeed';
+import { useAuthStore } from '../../store/authStore';
+import { PublishContentModal } from './components/PublishContentModal';
 
 export const CourseDetailScreen = () => {
-  // 1. Extraemos el ID de la URL
   const { id } = useParams<{ id: string }>();
-  
-  // 2. Hook para navegar (el equivalente a Navigator.pop en Flutter)
   const navigate = useNavigate();
-  
-  // 3. Nuestro estado global
   const { currentCourse, isLoading, error, fetchCourseById, clearCurrentCourse } = useCourseStore();
-
+  const user = useAuthStore((state) => state.user);
+  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+  const canPublish = user?.rol === 'Profesor' || user?.rol === 'Admin';
   useEffect(() => {
     if (id) {
       fetchCourseById(Number(id));
@@ -94,11 +92,24 @@ export const CourseDetailScreen = () => {
         <h2 className="text-xl font-bold text-text-primary mb-4 flex items-center gap-2">
           <span>⚡ Actividad del Curso</span>
         </h2>
-        
+        {canPublish && (
+            <button 
+              onClick={() => setIsPublishModalOpen(true)}
+              className="bg-primary text-surface-white font-bold mb-2 px-4 py-2 rounded-xl text-sm btn-animated shadow-sm flex items-center gap-2"
+            >
+              <span>+</span> Crear Publicación
+            </button>
+          )}
         {/* 2. INYECTAMOS EL COMPONENTE PASÁNDOLE EL ID */}
         {currentCourse && <CourseFeed courseId={currentCourse.id_curso} />}
       </div>
-
+      {currentCourse && (
+        <PublishContentModal
+          isOpen={isPublishModalOpen}
+          onClose={() => setIsPublishModalOpen(false)}
+          courseId={currentCourse.id_curso}
+        />
+      )}
     </div>
   );
 };

@@ -1,77 +1,127 @@
 import React from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import { Link, useLocation } from 'react-router-dom';
 
 interface LayoutProps {
-    children: React.ReactNode;
+  children: React.ReactNode;
 }
 
 export const Layout = ({ children }: LayoutProps) => {
-    const { user, logout } = useAuthStore();
-    const location = useLocation();
-    const getLinkClass = (path: string) => {
-        const isActive = location.pathname.includes(path);
-        return `flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors ${
-            isActive 
-                ? 'bg-primary/10 text-primary-dark' 
-                : 'text-text-secondary hover:bg-gray-100 hover:text-text-primary'
-            }`;
+  const { user } = useAuthStore();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Definimos los items del menú
+  const menuItems = [
+    {
+      label: 'Mis Clases',
+      path: '/clases',
+      icon: (
+        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        </svg>
+      ),
+      roles: ['Estudiante', 'Profesor', 'Admin']
+    },
+    {
+      label: 'Gestión Cursos',
+      path: '/admin',
+      icon: (
+        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      ),
+      roles: ['Admin']
     }
-    return (
-        <div className="flex h-screen bg-gray-50 overflow-hidden">
+  ];
+
+  return (
+    <div className="flex min-h-screen bg-[#F8FAFC]">
+      
+      {/* --- SIDEBAR --- */}
+      <aside className="w-72 bg-surface-white border-r border-gray-200 flex flex-col sticky top-0 h-screen">
         
-        {/* BARRA LATERAL (Sidebar) */}
-        <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
-            {/* Logo / Título */}
-            <div className="h-16 flex items-center px-6 border-b border-gray-100">
-            <h1 className="text-xl font-extrabold text-gray-900 tracking-tight">App Líderes</h1>
+        {/* Logo / Título */}
+        <div className="p-8">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
+              <span className="text-white font-black text-xl">E</span>
             </div>
-
-            {/* Menú de Navegación */}
-            <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-            {/* 2. Reemplazamos <a> por <Link> */}
-            <Link to="/clases" className={getLinkClass('/clases')}>
-                <span className="text-xl">📚</span> Mis Clases
-            </Link>
-            <Link to="/tareas" className={getLinkClass('/tareas')}>
-                <span className="text-xl">✅</span> Tareas Pendientes
-            </Link>
-            
-            {user?.rol !== 'Estudiante' && (
-                <Link to="/admin" className={getLinkClass('/admin')}>
-                <span className="text-xl">⚙️</span> Gestión de Cursos
-                </Link>
-            )}
-            </nav>
-
-            {/* Perfil y Logout (Abajo del todo) */}
-            <div className="p-4 border-t border-gray-100">
-            <div className="flex items-center gap-3 mb-4 px-2">
-                <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
-                {user?.nombre?.charAt(0) || 'U'}
-                </div>
-                <div className="flex flex-col">
-                <span className="text-sm font-bold text-gray-900">{user?.nombre}</span>
-                <span className="text-xs text-gray-500">{user?.rol}</span>
-                </div>
+            <div>
+              <h1 className="text-xl font-black text-primary-dark leading-tight">Escuela</h1>
+              <p className="text-[10px] font-bold text-primary tracking-[0.2em] uppercase opacity-70">Líderes</p>
             </div>
-            
-            <button 
-                onClick={logout}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
-            >
-                Cerrar Sesión
-            </button>
-            </div>
-        </aside>
-
-        {/* ÁREA CENTRAL DE CONTENIDO */}
-        <main className="flex-1 flex flex-col h-screen overflow-hidden">
-            <div className="flex-1 overflow-y-auto p-8">
-            {/* El contenido inyectado */}
-            {children}
-            </div>
-        </main>
+          </div>
         </div>
-    );
+
+        {/* Navegación Principal */}
+        <nav className="flex-1 px-4 space-y-2">
+          {menuItems.map((item) => {
+            // Filtro de roles: Si la ruta requiere un rol que el usuario no tiene, no la mostramos
+            if (!item.roles.includes(user?.rol || '')) return null;
+
+            const isActive = location.pathname.startsWith(item.path);
+
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all duration-200 ${
+                  isActive 
+                    ? 'bg-primary text-surface-white shadow-md shadow-primary/20 scale-[1.02]' 
+                    : 'text-text-secondary hover:bg-gray-100 hover:text-text-primary'
+                }`}
+              >
+                {item.icon}
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* --- SECCIÓN INFERIOR: PERFIL --- */}
+        <div className="p-4 border-t border-gray-100">
+          <Link 
+            to="/perfil"
+            className={`group flex items-center gap-3 p-3 rounded-2xl transition-all duration-200 ${
+              location.pathname === '/perfil' 
+                ? 'bg-gray-100 ring-1 ring-gray-200' 
+                : 'hover:bg-gray-50'
+            }`}
+          >
+            {/* Avatar con Inicial */}
+            <div className="w-11 h-11 rounded-full bg-primary/10 text-primary flex items-center justify-center font-black text-lg border-2 border-surface-white shadow-sm group-hover:scale-105 transition-transform">
+              {user?.nombre?.charAt(0).toUpperCase() || 'U'}
+            </div>
+            
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-black text-text-primary truncate">{user?.nombre}</p>
+              <div className="flex items-center gap-1.5">
+                <span className={`w-1.5 h-1.5 rounded-full ${user?.rol === 'Admin' ? 'bg-purple-500' : 'bg-green-500'}`}></span>
+                <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">{user?.rol}</p>
+              </div>
+            </div>
+
+            <div className="text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </Link>
+        </div>
+      </aside>
+
+      {/* --- CONTENIDO PRINCIPAL --- */}
+      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Scrollable Area */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden">
+          <div className="max-w-6xl mx-auto p-8 lg:p-12">
+            {children}
+          </div>
+        </div>
+      </main>
+
+    </div>
+  );
 };

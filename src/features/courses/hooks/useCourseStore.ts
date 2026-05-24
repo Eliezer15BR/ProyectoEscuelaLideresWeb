@@ -21,7 +21,7 @@ export const useCourseStore = create<CourseState> ((set)=>({
     fetchCourses: async() => {
         set({ isLoading: true, error: null});
         try{
-            const data = await courseService.getAll();
+            const data = await courseService.getMyCourses();
             set({courses: data, isLoading: false});
         }catch(error: any){
             set({

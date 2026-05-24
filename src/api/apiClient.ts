@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { useAuthStore } from '../store/authStore';
 export const apiClient = axios.create({
-    baseURL: 'https://app-lideres.onrender.com/api',
+    baseURL: 'http://localhost:3000/api',
     headers: {
         'Content-type': 'application/json',
     }

@@ -10,8 +10,12 @@ export interface Course{
     id_profesor: number;
 }
 export const courseService = {
-    getAll: async(): Promise<Course[]> => {
+    getMyCourses: async(): Promise<Course[]> => {
         const response = await apiClient.get('/curso/my');
+        return response.data;
+    },
+    getAll: async(): Promise<Course[]> => {
+        const response = await apiClient.get('/curso');
         return response.data;
     },
     getById: async(id: number): Promise<Course> => {
@@ -23,6 +27,7 @@ export const courseService = {
         return response.data;
     },
     delete: async(id: number): Promise<void> => {
-        await apiClient.delete(`/curso/${id}`);
+        const response = await apiClient.delete(`/curso/${id}`);
+        return response.data;
     }
 };

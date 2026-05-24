@@ -27,5 +27,13 @@ export const feedService = {
   getCourseFeed: async (courseId: number): Promise<FeedResponse> => {
     const response = await apiClient.get(`/curso/${courseId}/recursos`);
     return response.data;
+  },
+  createTarea: async (courseId: number, data: any) => {
+    const response = await apiClient.post('/tarea',{...data, id_curso: courseId});
+    return response.data;
+  },
+  createMaterial: async (courseId: number, data: any) => {
+    const response = await apiClient.post('/material', { ...data, id_curso: courseId });
+    return response.data;
   }
 };
