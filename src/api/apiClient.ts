@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, {type InternalAxiosRequestConfig, AxiosError} from 'axios'
 import { useAuthStore } from '../store/authStore';
 export const apiClient = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
@@ -6,13 +6,13 @@ export const apiClient = axios.create({
         'Content-type': 'application/json',
     }
 });
-apiClient.interceptors.request.use((config)=>{
+apiClient.interceptors.request.use((config: InternalAxiosRequestConfig)=>{
     const token = localStorage.getItem('app_lideres_jwt_token');
     if(token && config.headers){
         config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
-},(error) => {
+},(error: AxiosError | any) => {
     if(error.response && error.response.status === 401){
         console.warn("La sesión expiro o el token es invalido");
         useAuthStore.getState().logout();

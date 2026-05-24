@@ -35,7 +35,7 @@ export const LoginScreen = () => {
             password,
         });
         const { access_token } = response.data;
-        loginGlobal(null, access_token);
+        loginGlobal(null as any, access_token);
         const user = await apiClient.get('/auth/profile');
         const userData = user.data;
         loginGlobal(userData, access_token);

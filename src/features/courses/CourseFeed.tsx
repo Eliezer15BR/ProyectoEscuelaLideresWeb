@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useFeedStore } from './hooks/useFeedStore';
 import { MaterialCard } from './components/MaterialCard';
 import { TaskCard } from './components/TaskCard';

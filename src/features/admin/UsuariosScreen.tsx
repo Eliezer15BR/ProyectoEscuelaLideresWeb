@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '../../components/Button';
 import { InputField } from '../../components/InputField';
 import { usuarioService } from './services/usuarioService';
@@ -56,12 +56,9 @@ export const UsuariosScreen = () => {
     e.preventDefault();
     setIsSaving(true);
     try {
-      const payload = { ...formData };
+        const {password, ...restoDeDatos } = formData;
+      const payload = (editingUser && !password)? restoDeDatos: formData;
       // Si estamos editando y no escribió password nuevo, lo quitamos del payload
-      if (editingUser && !payload.password) {
-        delete payload.password;
-      }
-
       if (editingUser) {
         await usuarioService.update(editingUser.id_usuario, payload);
       } else {
