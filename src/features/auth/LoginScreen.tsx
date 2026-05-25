@@ -4,6 +4,7 @@ import { InputField } from '../../components/InputField';
 import { Button } from '../../components/Button';
 import { useAuthStore } from '../../store/authStore';
 import { apiClient } from '../../api/apiClient';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 export const LoginScreen = () => {
   // 1. Estados locales para capturar lo que escribe el usuario
@@ -16,7 +17,7 @@ export const LoginScreen = () => {
 
     // 2. Traemos la acción 'login' de nuestro store global de Zustand
     const loginGlobal = useAuthStore((state) => state.login);
-
+    const [captchaToken, setCaptchaToken] = useState(false);
     // 3. Manejador del envío del formulario
     const handleSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault(); // Evita que la página se recargue (comportamiento nativo de HTML)
@@ -25,6 +26,10 @@ export const LoginScreen = () => {
         // Validación básica antes de gastar recursos llamando a la API
         if (!correo.trim() || !password.trim()) {
             setFormError('Por favor, llena todos los campos.');
+            return;
+        }
+        if (!captchaToken) {
+            setFormError('Por favor, verifica que no eres un robot.');
             return;
         }
         setIsLoading(true);
@@ -96,7 +101,16 @@ export const LoginScreen = () => {
                 disabled={isLoading}
                 required
                 />
-
+                <div className="flex justify-center my-6">
+                    <ReCAPTCHA
+                    // Clave pública oficial de prueba de Google (siempre aprueba)
+                    sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY} 
+                    onChange={(token) => {
+                        // Si Google nos da un token, marcamos como válido. Si expira (null), lo volvemos false.
+                        setCaptchaToken(!!token); 
+                    }}
+                    />
+                </div>
                 {/* Separación sutil antes del botón */}
                 <div className="pt-2">
                 <Button 
