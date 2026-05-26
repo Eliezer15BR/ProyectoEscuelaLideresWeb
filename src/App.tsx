@@ -13,6 +13,7 @@ import { TareaDetailScreen } from './features/courses/TareaDetailScreen';
 import { RevisionesScreen } from './features/courses/RevisionesScreen';
 import { PendientesScreen } from './features/courses/PendientesScreen';
 import { UsuariosScreen } from './features/admin/UsuariosScreen';
+import { LogsScreen } from './features/admin/LogsScreen';
 
 export const App = () => {
   const { isAuthenticated, checkAuth, isCheckingAuth } = useAuthStore();
@@ -90,6 +91,11 @@ export const App = () => {
         <Route path="/usuarios" element={
           <ProtectedRoute allowedRoles={['Admin']}>
             <Layout><UsuariosScreen /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/logs" element={
+          <ProtectedRoute allowedRoles={['Admin']}>
+            <Layout><LogsScreen /></Layout>
           </ProtectedRoute>
         } />
         {/* RUTA COMODÍN */}

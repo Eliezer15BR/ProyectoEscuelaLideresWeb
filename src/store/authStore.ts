@@ -27,7 +27,8 @@ export const useAuthStore = create<AuthState>((set) => ({
         set({ user: userData, isAuthenticated: true });
     },
 
-    logout: () => {
+    logout: async() => {
+        await apiClient.post('/auth/logout',{});
         localStorage.removeItem('app_lideres_jwt_token');
         set({ user: null, isAuthenticated: false });
     },
