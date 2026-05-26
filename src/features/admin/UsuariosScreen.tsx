@@ -54,6 +54,12 @@ export const UsuariosScreen = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!editingUser || (editingUser && formData.password)) {
+      if (fuerzaPassword.nivel === 'No valido' || fuerzaPassword.nivel === 'Débil') {
+        alert('Por favor, ingresa una contraseña al menos de 8 caracteres.');
+        return;
+      }
+    }
     setIsSaving(true);
     try {
         const {password, ...restoDeDatos } = formData;
@@ -98,11 +104,28 @@ export const UsuariosScreen = () => {
       </span>
     );
   };
+  const evaluarFuerzaPassword = (password: string) => {
+    if (!password) return { nivel: '', color: 'bg-gray-200', ancho: 'w-0', texto: '' };
+
+    // Fuerte: Más de 8 caracteres, al menos 1 mayúscula, 1 número y 1 carácter especial
+    const esFuerte = password.length >= 8 && /[a-z]/.test(password) && /[A-Z]/.test(password) && /[0-9]/.test(password) && /[^A-Za-z0-9]/.test(password);
+    if (esFuerte) return { nivel: 'Fuerte', color: 'bg-green-500', ancho: 'w-full', texto: 'text-green-600' };
+
+    // Intermedio: Más de 6 caracteres y al menos un número o mayúscula
+    const esIntermedio = password.length >= 8 && (/[A-Z]/.test(password) && /[0-9]/.test(password)) && /[a-z]/.test(password);
+    if (esIntermedio) return { nivel: 'Intermedio', color: 'bg-orange-400', ancho: 'w-2/3', texto: 'text-orange-500' };
+    const debil = password.length >= 8;
+    if (debil) return { nivel: 'Débil', color: 'bg-red-500', ancho: 'w-1/3', texto: 'text-red-500' };
+    return { nivel: 'No valido', color: 'bg-gray-400', ancho: 'w-0', texto: 'text-gray-500' }
+    // Débil: Cualquier otra cosa (muy corta o puras minúsculas)
+  };
+  const fuerzaPassword = evaluarFuerzaPassword(formData.password);
   const opcionesRol = [
     { value: 'Estudiante', label: 'Estudiante' },
     { value: 'Profesor', label: 'Profesor' },
     { value: 'Admin', label: 'Administrador' }
   ];
+
   if (isLoading) return <div className="flex justify-center p-12"><div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div></div>;
 
   return (
@@ -173,7 +196,29 @@ export const UsuariosScreen = () => {
                 onChange={(e) => setFormData({...formData, password: e.target.value})} 
                 required={!editingUser} 
               />
-              
+              {formData.password.length > 0 && (
+                  <div className="mt-2 animate-fade-in">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">
+                        Seguridad
+                      </span>
+                      <span className={`text-[10px] font-bold uppercase tracking-wider ${fuerzaPassword.texto}`}>
+                        {fuerzaPassword.nivel}
+                      </span>
+                    </div>
+                    {/* Barra de progreso minimalista */}
+                    <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full rounded-full transition-all duration-300 ${fuerzaPassword.color} ${fuerzaPassword.ancho}`}
+                      ></div>
+                    </div>
+                    <div className='text-xs text-gray-500'>
+                      La contraseña debe tener como mínimo 8 caracteres. <br />
+                      Para que su contraseña sea considerada fuerte debe cumplir con: <br />
+                      Min. 1 minúscula, 1 mayúscula, 1 número, 1 caracter especial ( *, $, !, =)
+                    </div>
+                  </div>
+                )}
               <div>
                 <div className="z-50 relative">
                 <SelectField 

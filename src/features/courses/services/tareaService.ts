@@ -7,7 +7,7 @@ export const tareaService = {
     return response.data;
   },
   
-  update: async (tareaId: string | number, data: { titulo: string; descripcion: string; fecha_entrega?: string }) => {
+  update: async (tareaId: string | number, data: { titulo: string; descripcion: string; fecha_entrega?: string, calificacion?: number }) => {
     const response = await apiClient.patch(`/tarea/${tareaId}`, data);
     return response.data;
   },

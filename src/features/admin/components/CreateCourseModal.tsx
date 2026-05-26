@@ -35,7 +35,12 @@ export const CreateCourseModal = ({ isOpen, onClose, onSuccess }: CreateCourseMo
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (idProfesor === '') return; // Validación extra
-
+    if (fechaInicio && fechaFin) {
+      if (fechaFin <= fechaInicio) {
+        alert("La fecha de finalización debe ser estrictamente posterior a la fecha de inicio.");
+        return;
+      }
+    }
     setIsLoading(true);
 
     const success = await createCourse({
@@ -59,7 +64,13 @@ export const CreateCourseModal = ({ isOpen, onClose, onSuccess }: CreateCourseMo
       setIdProfesor('');
     }
   };
+  const hoy = new Date();
+  hoy.setMinutes(hoy.getMinutes() - hoy.getTimezoneOffset());
+  const hoyStr = hoy.toISOString().split('T')[0];
 
+  // 2. El mínimo para Fecha Fin será "hoy", PERO si la fecha de inicio es en el futuro, 
+  // el mínimo será esa fecha de inicio para que no elijan una fecha anterior a la de inicio.
+  const minFechaFin = fechaInicio && fechaInicio > hoyStr ? fechaInicio : hoyStr;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
       <div className="bg-surface-white w-full max-w-lg rounded-2xl p-6 shadow-xl flex flex-col max-h-[90vh] animate-scale-up">
@@ -102,6 +113,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onSuccess }: CreateCourseMo
             <InputField
               label="Cupos Disponibles"
               type="number"
+              min={1}
               value={cupos.toString()}
               onChange={(e) => setCupos(Number(e.target.value))}
               required
@@ -137,6 +149,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onSuccess }: CreateCourseMo
             <InputField
               label="Fecha de Finalización"
               type="date"
+              min={minFechaFin}
               value={fechaFin}
               onChange={(e) => setFechaFin(e.target.value)}
               required

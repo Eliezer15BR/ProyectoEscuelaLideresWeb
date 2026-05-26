@@ -4,14 +4,15 @@ import { tareaService } from './services/tareaService';
 import { entregaService } from './services/entregaService';
 import { Button } from '../../components/Button';
 
-// --- EL MINI-COMPONENTE VIVE AQUÍ AHORA ---
-// --- COMPONENTE TARJETA DE CALIFICACIÓN ---
+
 const SubmissionCard = ({ 
-  entrega, 
+  entrega,
+  notaMaxima,
   onCalificar, 
   onAnular 
 }: { 
-  entrega: any; 
+  entrega: any;
+  notaMaxima: number;
   onCalificar: (id: number, nota: number, comentario: string) => Promise<void>;
   onAnular: (id: number) => Promise<void>; 
 }) => {
@@ -23,9 +24,15 @@ const SubmissionCard = ({
   const isGraded = entrega.calificacion !== null && entrega.calificacion !== undefined;
 
   const handleSave = async () => {
-    if (nota === '') return alert('Por favor, ingresa una calificación.');
+    if (nota === '') {
+      return alert('Por favor, ingresa una calificación.');
+    }
+    const valorNota = Number(nota);
+    if (valorNota < 0 || valorNota > notaMaxima) {
+      return alert(`Error: La calificación debe ser un número entre 0 y ${notaMaxima}.`);
+    }
     setIsSaving(true);
-    await onCalificar(entrega.id || entrega.id_entrega, Number(nota), comentario);
+    await onCalificar(entrega.id || entrega.id_entrega, valorNota, comentario);
     setIsSaving(false);
   };
 
@@ -67,9 +74,9 @@ const SubmissionCard = ({
 
       <div className="flex gap-4 items-start flex-wrap lg:flex-nowrap pt-4 border-t border-gray-100">
         <div className="w-full lg:w-24">
-          <label className="block text-xs font-bold text-text-secondary mb-1">Nota (0-100)</label>
+          <label className="block text-xs font-bold text-text-secondary mb-1">Nota (0-{notaMaxima})</label>
           <input 
-            type="number" min="0" max="100" 
+            type="number" min="0" max={notaMaxima}
             value={nota} onChange={(e) => setNota(e.target.value ? Number(e.target.value) : '')}
             disabled={isSaving}
             className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-text-primary font-bold text-center focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary disabled:opacity-50"
@@ -185,6 +192,7 @@ export const RevisionesScreen = () => {
             <SubmissionCard 
               key={entregaItem.id || entregaItem.id_entrega} 
               entrega={entregaItem} 
+              notaMaxima={tarea?.calificacion || 100}
               onCalificar={handleCalificar}
               onAnular={handleAnularCalificacion}
             />

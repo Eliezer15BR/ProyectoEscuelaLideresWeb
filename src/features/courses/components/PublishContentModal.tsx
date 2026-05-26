@@ -18,7 +18,7 @@ export const PublishContentModal = ({ isOpen, onClose, courseId }: PublishConten
   const [titulo, setTitulo] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [fechaEntrega, setFechaEntrega] = useState(''); 
-
+  const [calificacion, setCalificacion] = useState(100);
   useEffect(() => {
     if (!isOpen) clearPublishError();
   }, [isOpen]);
@@ -31,7 +31,7 @@ export const PublishContentModal = ({ isOpen, onClose, courseId }: PublishConten
 
     // Payload súper limpio, sin archivos raros
     const payload = tipo === 'tarea' 
-      ? { titulo, descripcion, fecha_entrega: new Date(fechaEntrega).toISOString() }
+      ? { titulo, descripcion, fecha_entrega: new Date(fechaEntrega).toISOString(), calificacion: Number(calificacion) }
       : { titulo, descripcion };
 
     const success = await publishContent(courseId, tipo, payload);
@@ -43,9 +43,12 @@ export const PublishContentModal = ({ isOpen, onClose, courseId }: PublishConten
       setDescripcion('');
       setFechaEntrega('');
       setTipo('material');
+      setCalificacion(100);
     }
   };
-
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+  const fechaMinima = now.toISOString().slice(0,16);
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
       <div className="bg-surface-white w-full max-w-lg rounded-2xl p-6 shadow-xl flex flex-col max-h-[90vh] animate-scale-up">
@@ -70,7 +73,7 @@ export const PublishContentModal = ({ isOpen, onClose, courseId }: PublishConten
             disabled={isLoading}
             options={[
               { value: 'material', label: '📚 Material de Estudio (Aviso/Archivo)' },
-              { value: 'tarea', label: '📝 Tarea (Requiere entrega)' }
+              { value: 'tarea', label: '📝 Tarea' }
             ]}
           />
 
@@ -101,6 +104,7 @@ export const PublishContentModal = ({ isOpen, onClose, courseId }: PublishConten
               <InputField
                 label="Fecha límite de entrega"
                 type="datetime-local" 
+                min={fechaMinima}
                 value={fechaEntrega}
                 onChange={(e) => setFechaEntrega(e.target.value)}
                 required={tipo === 'tarea'}
@@ -108,7 +112,16 @@ export const PublishContentModal = ({ isOpen, onClose, courseId }: PublishConten
               />
             )}
           </div>
-
+            <InputField
+                  label="Calificación Máxima"
+                  type="number"
+                  min={1}
+                  max={100}
+                  value={calificacion.toString()}
+                  onChange={(e) => setCalificacion(Number(e.target.value))}
+                  required={tipo === 'tarea'}
+                  disabled={isLoading}
+                />
           <div className="pt-4 flex gap-3 justify-end">
             <button
               type="button"

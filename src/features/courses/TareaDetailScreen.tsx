@@ -29,8 +29,8 @@ export const TareaDetailScreen = () => {
   const [editTitulo, setEditTitulo] = useState('');
   const [editDescripcion, setEditDescripcion] = useState('');
   const [editFechaEntrega, setEditFechaEntrega] = useState('');
+  const [editCalificacion, setEditCalificacion] = useState<number | ''>(100);
   const [isSaving, setIsSaving] = useState(false);
-
   const canManage = user?.rol === 'Admin' || user?.rol === 'Profesor';
   const isEstudiante = user?.rol === 'Estudiante';
 
@@ -57,7 +57,7 @@ export const TareaDetailScreen = () => {
       setEditTitulo(dataTarea.titulo);
       setEditDescripcion(dataTarea.descripcion);
       setEditFechaEntrega(formatForInput(dataTarea.fecha_entrega));
-
+      setEditCalificacion(dataTarea.calificacion ?? 100);
       if (isEstudiante) {
         try {
           const res = await entregaService.getByTarea(taskId);
@@ -102,7 +102,8 @@ export const TareaDetailScreen = () => {
       await tareaService.update(taskId, { 
         titulo: editTitulo, 
         descripcion: editDescripcion,
-        fecha_entrega: fechaISO
+        fecha_entrega: fechaISO,
+        calificacion: Number(editCalificacion)
       });
       await loadTarea();
       setIsEditing(false);
@@ -238,7 +239,9 @@ export const TareaDetailScreen = () => {
   if (!tarea) return <div className="text-center p-12 text-text-secondary">Tarea no encontrada.</div>;
 
   const isOverdue = tarea.fecha_entrega ? new Date(tarea.fecha_entrega) < new Date() : false;
-
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+  const fechaMinima = now.toISOString().slice(0,16);
   return (
     <div className="flex flex-col gap-6 relative animate-fade-in pb-10">
       
@@ -251,15 +254,27 @@ export const TareaDetailScreen = () => {
       {/* CABECERA DE LA TAREA */}
       <div className="bg-surface-white rounded-2xl p-8 border border-gray-100 shadow-sm relative overflow-hidden group">
         <div className="absolute top-0 left-0 w-full h-2 bg-orange-400"></div>
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-orange-600 bg-orange-50 px-3 py-1 rounded-full">📝 Tarea Asignada</span>
+       <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-orange-600 bg-orange-50 px-3 py-1 rounded-full">
+              📝 Tarea Asignada
+            </span>
+            
+            {/* NUEVO: Insignia del puntaje máximo visible para todos */}
+            {!isEditing && (
+              <span className="text-sm font-bold text-text-secondary flex items-center gap-1 bg-gray-50 px-3 py-1 rounded-full border border-gray-100">
+                ⭐ Valor: {tarea.calificacion || 100} pts
+              </span>
+            )}
+
             {tarea.fecha_entrega && !isEditing && (
-               <span className={`text-sm font-bold flex items-center gap-1 ${isOverdue ? 'text-red-500' : 'text-text-secondary'}`}>
+               <span className={`text-sm font-bold flex items-center gap-1 bg-gray-50 px-3 py-1 rounded-full border border-gray-100 ${isOverdue ? 'text-red-500 border-red-100 bg-red-50' : 'text-text-secondary'}`}>
                  ⏱️ Vence: {new Date(tarea.fecha_entrega).toLocaleString('es-ES', { dateStyle: 'long', timeStyle: 'short' })}
                </span>
             )}
           </div>
+
+          {/* Botones de edición (sin cambios) */}
           {canManage && !isEditing && (
             <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
               <button onClick={() => setIsEditing(true)} className="p-2 text-text-secondary hover:text-orange-600 rounded-lg">✏️</button>
@@ -280,13 +295,41 @@ export const TareaDetailScreen = () => {
         {isEditing ? (
           <div className="space-y-4 animate-fade-in border-t border-gray-100 pt-4">
             <InputField label="Título de la Tarea" type="text" value={editTitulo} onChange={(e) => setEditTitulo(e.target.value)} disabled={isSaving} />
-            <InputField label="Fecha Límite de Entrega" type="datetime-local" value={editFechaEntrega} onChange={(e) => setEditFechaEntrega(e.target.value)} disabled={isSaving} required />
+            
+            {/* NUEVO: Grid para poner Fecha y Nota lado a lado */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <InputField label="Fecha Límite de Entrega" type="datetime-local" min={fechaMinima} value={editFechaEntrega} onChange={(e) => setEditFechaEntrega(e.target.value)} disabled={isSaving} required />
+              
+              <InputField 
+                label="Calificación Máxima" 
+                type="number" 
+                min={1}
+                max={100}
+                value={editCalificacion.toString()} 
+                onChange={(e) => setEditCalificacion(e.target.value ? Number(e.target.value) : '')} 
+                disabled={isSaving} 
+                required 
+              />
+            </div>
+
             <div>
               <label className="block text-sm font-bold text-text-primary mb-1.5">Instrucciones</label>
               <textarea className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-text-primary text-sm focus:outline-none focus:border-primary/50 transition-colors resize-none h-32" value={editDescripcion} onChange={(e) => setEditDescripcion(e.target.value)} disabled={isSaving} />
             </div>
             <div className="flex justify-end gap-3 pt-2">
-              <button onClick={() => { setIsEditing(false); setEditTitulo(tarea.titulo); setEditDescripcion(tarea.descripcion); setEditFechaEntrega(formatForInput(tarea.fecha_entrega)); }} className="px-4 py-2 text-sm font-bold text-text-secondary hover:text-text-primary" disabled={isSaving}>Cancelar</button>
+              <button 
+                onClick={() => { 
+                  setIsEditing(false); 
+                  setEditTitulo(tarea.titulo); 
+                  setEditDescripcion(tarea.descripcion); 
+                  setEditFechaEntrega(formatForInput(tarea.fecha_entrega));
+                  setEditCalificacion(tarea.calificacion ?? 100); // NUEVO: Resetear al cancelar
+                }} 
+                className="px-4 py-2 text-sm font-bold text-text-secondary hover:text-text-primary" 
+                disabled={isSaving}
+              >
+                Cancelar
+              </button>
               <div className="w-32"><Button onClick={handleUpdate} isLoading={isSaving}>Guardar</Button></div>
             </div>
           </div>
@@ -375,7 +418,10 @@ export const TareaDetailScreen = () => {
               <div className="flex flex-col sm:flex-row sm:items-center gap-6">
                 <div className="flex flex-col items-center justify-center p-4 bg-white rounded-xl border border-orange-200 min-w-[120px] shadow-sm">
                   <span className="text-4xl font-extrabold text-orange-600">{entrega.calificacion}</span>
-                  <span className="text-xs font-bold text-text-secondary mt-1">/ 100 pts</span>
+                  {/* AQUÍ ESTÁ EL CAMBIO: Extraemos la calificación de la tarea dinámicamente */}
+                  <span className="text-xs font-bold text-text-secondary mt-1">
+                    / {tarea.calificacion || 100} pts
+                  </span>
                 </div>
                 {entrega.comentario_profesor && (
                   <div className="flex-1 bg-white p-4 rounded-xl border border-gray-100 shadow-sm relative">
