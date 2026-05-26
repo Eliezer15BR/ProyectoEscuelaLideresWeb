@@ -7,7 +7,6 @@ import { tareaService } from './services/tareaService';
 const ExpansionSection = ({ title, count, tasks, defaultExpanded = false }: any) => {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded || count > 0);
   const navigate = useNavigate();
-
   return (
     <div className="bg-surface-white rounded-xl border border-gray-100 shadow-sm overflow-hidden mb-4">
       {/* Cabecera Clickable */}
@@ -45,7 +44,7 @@ const ExpansionSection = ({ title, count, tasks, defaultExpanded = false }: any)
                 {tasks.map((tarea: any) => (
                   <div 
                     key={tarea.id} 
-                    onClick={() => navigate(`/clases/${tarea.curso?.id || tarea.id_curso}/tarea/${tarea.id}`)}
+                    onClick={() => navigate(`/clases/${tarea.curso?.id_curso || tarea.id_curso}/tarea/${tarea.id_tarea}`)}
                     className="p-5 hover:bg-gray-50 cursor-pointer transition-colors group flex justify-between items-center"
                   >
                     <div>
