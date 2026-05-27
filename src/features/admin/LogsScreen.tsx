@@ -9,7 +9,9 @@ export const LogsScreen = () => {
   
   const [logs, setLogs] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 15;
   // --- 🛡️ PROTECCIÓN DE RUTA ---
   useEffect(() => {
     // Si ya cargó el usuario y no es Admin, lo sacamos de aquí
@@ -21,13 +23,11 @@ export const LogsScreen = () => {
   // --- 📡 CARGA DE DATOS ---
   useEffect(() => {
     const fetchLogs = async () => {
+      setIsLoading(true); // Mostrar loading al cambiar de página
       try {
-        // Asegúrate de que tu backend tenga este controlador creado
-        const response = await apiClient.get('/log-acceso'); 
-        
-        // Invertimos el array para que los registros más nuevos salgan arriba
-        const logsOrdenados = response.data.reverse(); 
-        setLogs(logsOrdenados);
+        const response = await apiClient.get(`/log-acceso?page=${currentPage}&limit=${limit}`); 
+        setLogs(response.data.data);
+        setTotalPages(response.data.meta.totalPages);
       } catch (error) {
         console.error('Error al cargar la bitácora', error);
       } finally {
@@ -38,7 +38,7 @@ export const LogsScreen = () => {
     if (user?.rol === 'Admin') {
       fetchLogs();
     }
-  }, [user]);
+  }, [user, currentPage]);
 
   // --- 🎨 RENDERIZADO DEL BADGE ---
   const renderEventoBadge = (evento: string) => {
@@ -126,7 +126,31 @@ export const LogsScreen = () => {
           </table>
         </div>
       </div>
-      
+              {!isLoading && totalPages > 1 && (
+        <div className="flex items-center justify-between px-4 py-6 mt-2">
+          <span className="text-sm text-text-secondary">
+            Página <span className="font-bold text-text-primary">{currentPage}</span> de <span className="font-bold text-text-primary">{totalPages}</span>
+          </span>
+          
+          <div className="flex gap-2">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 text-sm font-medium border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-text-secondary"
+            >
+              Anterior
+            </button>
+            
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 text-sm font-medium border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-text-secondary"
+            >
+              Siguiente
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -6,6 +6,7 @@ import { Button } from '../../components/Button';
 import { CourseFeed } from './CourseFeed';
 import { useAuthStore } from '../../store/authStore';
 import { PublishContentModal } from './components/PublishContentModal';
+import { PanelReporteNotas } from './PanelReporteNotas'; 
 
 export const CourseDetailScreen = () => {
   const { id } = useParams<{ id: string }>();
@@ -13,12 +14,14 @@ export const CourseDetailScreen = () => {
   const { currentCourse, isLoading, error, fetchCourseById, clearCurrentCourse } = useCourseStore();
   const user = useAuthStore((state) => state.user);
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+  
+  // 2. APROVECHAMOS ESTA VARIABLE PARA PROTEGER EL CONTENIDO
   const canPublish = user?.rol === 'Profesor' || user?.rol === 'Admin';
+  
   useEffect(() => {
     if (id) {
       fetchCourseById(Number(id));
     }
-    // Cuando el usuario salga de la pantalla, limpiamos la memoria
     return () => clearCurrentCourse();
   }, [id]);
 
@@ -39,13 +42,12 @@ export const CourseDetailScreen = () => {
     );
   }
 
-  // Función para formatear fechas limpio
   const formatDate = (dateString: string) => {
     return new Intl.DateTimeFormat('es-ES', { dateStyle: 'long' }).format(new Date(dateString));
   };
 
   return (
-    <div className="flex flex-col gap-6 animate-fade-in">
+    <div className="flex flex-col gap-6 animate-fade-in pb-10">
       
       {/* Botón de retroceso sutil */}
       <div>
@@ -87,22 +89,37 @@ export const CourseDetailScreen = () => {
         </div>
       </div>
 
+      {/* --- 📊 PANEL DE REPORTES (SOLO PROFESOR / ADMIN) --- */}
+      {/* Lo colocamos aquí arriba para que sea de fácil acceso para el docente */}
+      {canPublish && currentCourse && (
+        <PanelReporteNotas 
+          cursoId={currentCourse.id_curso} 
+          cursoNombre={currentCourse.nombre} 
+        />
+      )}
+
       {/* Aquí abajo irá el contenido dinámico (Tareas, Alumnos, etc.) */}
       <div className="mt-8">
-        <h2 className="text-xl font-bold text-text-primary mb-4 flex items-center gap-2">
-          <span>⚡ Actividad del Curso</span>
-        </h2>
-        {canPublish && (
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-bold text-text-primary flex items-center gap-2">
+            <span>⚡ Actividad del Curso</span>
+          </h2>
+          
+          {canPublish && (
             <button 
               onClick={() => setIsPublishModalOpen(true)}
-              className="bg-primary text-surface-white font-bold mb-2 px-4 py-2 rounded-xl text-sm btn-animated shadow-sm flex items-center gap-2"
+              className="bg-primary text-surface-white font-bold px-5 py-2.5 rounded-xl text-sm btn-animated shadow-sm flex items-center gap-2"
             >
-              <span>+</span> Crear Publicación
+              <span className="text-lg leading-none">+</span> Crear Publicación
             </button>
           )}
-        {/* 2. INYECTAMOS EL COMPONENTE PASÁNDOLE EL ID */}
+        </div>
+
+        {/* FEED DE ACTIVIDAD */}
         {currentCourse && <CourseFeed courseId={currentCourse.id_curso} />}
       </div>
+
+      {/* MODAL DE PUBLICACIÓN */}
       {currentCourse && (
         <PublishContentModal
           isOpen={isPublishModalOpen}

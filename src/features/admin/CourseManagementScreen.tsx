@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAdminStore } from './hooks/useAdminStore';
 import { EnrollStudentModal } from './components/EnrollStudentModal';
 import { CreateCourseModal } from './components/CreateCourseModal';
+import { EstadisticasCursos } from './EstadisticasCursos';
 
 export const CourseManagementScreen = () => {
   // 1. Traemos el estado y las acciones de nuestro Store administrativo
@@ -56,7 +57,7 @@ export const CourseManagementScreen = () => {
           <span className="text-lg leading-none">+</span> Crear Curso
         </button>
       </div>
-
+      <EstadisticasCursos/>
       {/* --- LISTA DE CURSOS --- */}
       <div className="bg-surface-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
         {(!courses || courses.length === 0) ? (
