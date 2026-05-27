@@ -19,7 +19,7 @@ export const exportToPDF = (data: any[], courseName: string) => {
 
   // Extraemos las cabeceras (las llaves del primer objeto) y las filas (los valores)
   const tableColumns = Object.keys(data[0]);
-  const tableRows = data.map((row) => Object.values(row));
+  const tableRows = data.map((row) => Object.values(row).map(String));
 
   // Dibujamos la tabla
   autoTable(doc, {
