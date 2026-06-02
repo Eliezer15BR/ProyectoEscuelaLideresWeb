@@ -142,9 +142,9 @@ export const MaterialDetailScreen = () => {
         <div className="flex items-center justify-between mb-4">
           <span className="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-3 py-1 rounded-full">📚 Material de Estudio</span>
           {canManage && !isEditing && (
-            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button onClick={() => setIsEditing(true)} className="p-2 text-text-secondary hover:text-blue-600 rounded-lg">✏️</button>
-              <button onClick={handleDelete} className="p-2 text-text-secondary hover:text-red-600 rounded-lg">🗑️</button>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setIsEditing(true)} className="p-2 text-text-secondary hover:bg-blue-300 transition-colors rounded-lg">✏️</button>
+              <button onClick={handleDelete} className="p-2 text-text-secondary hover:bg-red-300 transition-colors rounded-lg">🗑️</button>
             </div>
           )}
         </div>

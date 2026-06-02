@@ -276,9 +276,9 @@ export const TareaDetailScreen = () => {
 
           {/* Botones de edición (sin cambios) */}
           {canManage && !isEditing && (
-            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button onClick={() => setIsEditing(true)} className="p-2 text-text-secondary hover:text-orange-600 rounded-lg">✏️</button>
-              <button onClick={handleDelete} className="p-2 text-text-secondary hover:text-red-600 rounded-lg">🗑️</button>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setIsEditing(true)} className="p-2 text-text-secondary hover:bg-orange-200 transition-colors rounded-lg">✏️</button>
+              <button onClick={handleDelete} className="p-2 text-text-secondary hover:bg-red-300 transition-colors rounded-lg">🗑️</button>
             </div>
           )}
         </div>
@@ -445,7 +445,7 @@ export const TareaDetailScreen = () => {
                      <a href={archivo.url} target="_blank" rel="noreferrer" className="px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-bold text-text-primary hover:bg-gray-50 transition-colors">Ver</a>
                      {/* Se oculta el botón de borrar archivo si ya está calificado */}
                      {!isOverdue && !isCalificada && (
-                       <button onClick={() => handleEliminarArchivoAlumno(archivo.id)} className="text-red-400 hover:text-red-600 p-1 transition-colors">✕</button>
+                       <button onClick={() => handleEliminarArchivoAlumno(archivo.id_archivo)} className="text-red-400 hover:text-red-600 p-1 transition-colors">✕</button>
                      )}
                   </div>
                 </div>
@@ -480,7 +480,8 @@ export const TareaDetailScreen = () => {
                       {archivosSubirAlumno.map((file, idx) => (
                         <li key={idx} className="flex justify-between items-center text-xs text-text-primary">
                           <span className="truncate pr-4">📄 {file.name}</span>
-                          <button onClick={() => setArchivosSubirAlumno(prev => prev.filter((_, i) => i !== idx))} className="text-red-500 font-bold px-1 hover:bg-red-50 rounded">✕</button>
+                          {!tieneEntregaActiva?
+                            <button onClick={() => setArchivosSubirAlumno(prev => prev.filter((_, i) => i !== idx))} className="text-red-500 font-bold px-1 hover:bg-red-50 rounded">✕s</button>:<>afsd</>}
                         </li>
                       ))}
                     </ul>
