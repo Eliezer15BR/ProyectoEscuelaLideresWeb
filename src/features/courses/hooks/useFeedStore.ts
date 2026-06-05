@@ -23,7 +23,6 @@ export const useFeedStore = create<FeedState>((set) => ({
     set({ isLoading: true });
     try {
       const data = await feedService.getCourseFeed(courseId);
-      // Guardamos ambas cosas tal como las mandó NestJS
       set({ cursoActual: data.curso, recursos: data.recursos, isLoading: false });
     } catch (error) {
       console.error("Error cargando el feed:", error);
@@ -33,25 +32,19 @@ export const useFeedStore = create<FeedState>((set) => ({
   publishContent: async (courseId, tipo, data) => {
     set({ publishError: null });
     try {
-      let nuevoContenido; // Guardamos la respuesta aquí
-      
+      let nuevoContenido;
       if (tipo === 'tarea') {
         nuevoContenido = await feedService.createTarea(courseId, data);
       } else {
         nuevoContenido = await feedService.createMaterial(courseId, data);
       }
-      
-      // Mantenemos esta línea para que tu backend vuelva a ordenar y mezclar
-      // las tareas y materiales con su lógica de fechas personalizada.
       const store = useFeedStore.getState();
       await store.fetchFeed(courseId);
-      
-      // En lugar de devolver true, devolvemos los datos reales del backend
       return nuevoContenido; 
       
     } catch (error: any) {
       set({ publishError: error.response?.data?.message || 'Error al publicar el contenido.' });
-      return null; // Retornamos null en lugar de false
+      return null;
     }
   },
 }));

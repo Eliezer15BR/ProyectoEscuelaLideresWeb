@@ -3,7 +3,7 @@ import { useAuthStore } from '../store/authStore';
 
 interface Props {
   children: React.ReactNode;
-  allowedRoles?: ('Admin' | 'Profesor' | 'Estudiante')[]; // <-- Propiedad opcional
+  allowedRoles?: ('Admin' | 'Profesor' | 'Estudiante')[];
 }
 
 export const ProtectedRoute = ({ children, allowedRoles }: Props) => {
@@ -22,13 +22,8 @@ export const ProtectedRoute = ({ children, allowedRoles }: Props) => {
   if (!isAuthenticated) {
     return <Navigate to="/" replace />;
   }
-
-  // 3. EL ESCUDO DE ROLES: Si la ruta exige roles específicos y el usuario no los tiene
   if (allowedRoles && user && !allowedRoles.includes(user.rol)) {
-    // Lo devolvemos a una ruta segura (sus clases)
     return <Navigate to="/clases" replace />;
   }
-
-  // 4. Si todo está bien, lo dejamos pasar
   return <>{children}</>;
 };

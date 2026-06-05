@@ -64,7 +64,6 @@ export const EnrollStudentModal = ({ isOpen, onClose, courseId, onSuccess }: Enr
           />
         </div>
 
-        {/* Mensaje de Error Interno */}
         {adminError && (
           <div className="p-3 mb-4 bg-error/10 border border-error/20 text-error text-sm font-medium rounded-lg">
             {adminError}

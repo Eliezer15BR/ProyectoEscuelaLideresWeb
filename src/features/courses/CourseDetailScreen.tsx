@@ -69,11 +69,9 @@ export const CourseDetailScreen = () => {
             <p className="text-text-secondary text-lg max-w-3xl">
               {currentCourse.descripcion}
             </p>
-          </div>
-          
-          <div className="bg-background-light px-4 py-2 rounded-xl text-center min-w-[100px]">
-            <span className="block text-2xl font-bold text-primary-dark">{currentCourse.cupos}</span>
-            <span className="text-xs text-primary-dark uppercase tracking-wider font-semibold">Cupos</span>
+            <p className='text-text-secondary text-lg max-w-3xl'>
+              Profesor: {currentCourse.profesor.nombre}
+            </p>
           </div>
         </div>
 

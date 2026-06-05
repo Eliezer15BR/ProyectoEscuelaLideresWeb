@@ -43,7 +43,7 @@ export const CourseListScreen = () => {
         <div className="flex justify-between items-end">
             <div>
             <h1 className="text-2xl font-extrabold text-primary-dark">Mis Clases</h1>
-            <p className="text-sm text-text-secondary mt-1">Explora los cursos en los que estás inscrito</p>
+            <p className="text-sm text-text-secondary mt-1">Cursos en los que estás inscrito</p>
             </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

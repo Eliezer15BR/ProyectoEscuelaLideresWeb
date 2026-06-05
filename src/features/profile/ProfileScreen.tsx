@@ -18,12 +18,10 @@ export const ProfileScreen = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/'); // Lo mandamos de vuelta al login
+    navigate('/');
   };
 
   if (!user) return null;
-
-  // Asignamos un color al badge dependiendo del rol
   const roleColors = {
     Admin: 'bg-purple-100 text-purple-700 border-purple-200',
     Profesor: 'bg-blue-100 text-blue-700 border-blue-200',
@@ -40,7 +38,6 @@ export const ProfileScreen = () => {
         
         <Card>
           <div className="p-8 flex flex-col items-center">
-            
             {/* Avatar Minimalista */}
             <div className="w-24 h-24 rounded-full bg-primary/10 text-primary flex items-center justify-center text-3xl font-extrabold mb-4 shadow-sm">
               {getInitials(user.nombre)}
@@ -57,7 +54,7 @@ export const ProfileScreen = () => {
             </div>
 
             {/* Línea divisoria sutil */}
-            <div className="w-full h-px bg-gray-100 my-6"></div>
+            <div className="w-full h-px bg-gray-200 my-6"></div>
 
             {/* Más información (si tu backend devuelve el correo u otros datos, los puedes poner aquí) */}
             <div className="w-full space-y-4">

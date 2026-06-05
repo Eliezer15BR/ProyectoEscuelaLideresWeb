@@ -11,7 +11,6 @@ export const PanelReporteNotas = ({ cursoId, cursoNombre }: Props) => {
   const [datosReporte, setDatosReporte] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 📡 LLAMADA AL BACKEND
   useEffect(() => {
     const fetchReporte = async () => {
       setIsLoading(true);
@@ -46,12 +45,11 @@ export const PanelReporteNotas = ({ cursoId, cursoNombre }: Props) => {
       </div>
     );
   }
-
   return (
     <div className="bg-surface-white p-6 rounded-2xl border border-gray-100 shadow-sm animate-fade-in">
       
       {/* --- CABECERA Y BOTONES --- */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h2 className="text-xl font-bold text-text-primary">Calificaciones del Curso</h2>
           <p className="text-sm text-text-secondary">Exportación de notas.</p>

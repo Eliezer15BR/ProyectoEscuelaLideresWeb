@@ -5,6 +5,7 @@ import { Button } from '../../components/Button';
 import { useAuthStore } from '../../store/authStore';
 import { apiClient } from '../../api/apiClient';
 import ReCAPTCHA from 'react-google-recaptcha';
+import { LogoInst } from '../../components/LogoInst';
 
 export const LoginScreen = () => {
   // 1. Estados locales para capturar lo que escribe el usuario
@@ -57,22 +58,18 @@ export const LoginScreen = () => {
     };
 
     return (
-        // Contenedor principal con Tailwind: Centrado absoluto en la pantalla
-        <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-primary flex flex-col justify-center py-2 sm:px-6 lg:px-8">
         
-        <div className="sm:mx-auto w-full max-w-md">
-            {/* Un encabezado sutil y minimalista */}
-            <h2 className="text-center text-3xl font-extrabold text-gray-900 tracking-tight">
-            Plataforma Educativa
-            </h2>
-            <p className="mt-2 text-center text-sm text-gray-600">
-            Ingresa tus credenciales para continuar
-            </p>
+        <div className="sm:mx-auto w-full max-w-md flex flex-col items-center">
+            <LogoInst className='bg-pink-900 flex justify-center items-center m-auto w-45 rounded-4xl'/>
         </div>
 
         <div className="mt-8 sm:mx-auto w-full max-w-md px-4 sm:px-0">
             {/* Nuestro componente Card conteniendo el formulario */}
             <Card>
+            <p className="mb-4 text-2xl text-black">
+                Iniciar sesión
+            </p>
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
                 
                 {/* Si hay un error general de la API, lo mostramos arriba */}
@@ -101,12 +98,10 @@ export const LoginScreen = () => {
                 disabled={isLoading}
                 required
                 />
-                <div className="flex justify-center my-6">
+                <div className="flex justify-center my-2">
                     <ReCAPTCHA
-                    // Clave pública oficial de prueba de Google (siempre aprueba)
                     sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY} 
                     onChange={(token) => {
-                        // Si Google nos da un token, marcamos como válido. Si expira (null), lo volvemos false.
                         setCaptchaToken(!!token); 
                     }}
                     />

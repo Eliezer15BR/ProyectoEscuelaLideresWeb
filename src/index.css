@@ -22,6 +22,9 @@
     /* Usamos @apply para inyectar la potencia de Tailwind sin escribir CSS tradicional */
     @apply transition-all duration-300 hover:scale-105;
   }
+  button{
+    cursor: pointer;
+  }
 }
 /* .bg-main{
     background-color: #8a2f63;

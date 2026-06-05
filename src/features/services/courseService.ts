@@ -7,6 +7,10 @@ export interface Course{
     cupos: number;
     fecha_inicio: string;
     fecha_fin: string;
+    profesor: {
+        nombre: string;
+        id_usuario: number;
+    }
     id_profesor: number;
 }
 export const courseService = {
@@ -24,6 +28,10 @@ export const courseService = {
     },
     create: async(courseData: Omit<Course,'id_curso'>): Promise<Course> => {
         const response = await apiClient.post('/curso',courseData);
+        return response.data;
+    },
+    update: async(id: number, courseData: Partial<Course>):Promise<Course> =>{
+        const response = await apiClient.patch(`/curso/${id}`,courseData);
         return response.data;
     },
     delete: async(id: number): Promise<void> => {

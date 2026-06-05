@@ -36,12 +36,11 @@ export const CourseFeed = ({ courseId }: { courseId: number }) => {
         if (isMaterial) {
           return <MaterialCard key={`mat-${item.id_material || item.id}`} material={item} courseId={courseId}/>;
         } else {
-          // Placeholder temporal para las Tareas
           return (
             <TaskCard 
               key={`task-${item.id_tarea || item.id}`} 
               tarea={item} 
-              courseId={courseId} // Pasamos el ID del curso para el botón "Ver Tarea"
+              courseId={courseId}
             />
           );
         }

@@ -14,7 +14,7 @@ export const exportToPDF = (data: any[], courseName: string) => {
 
   // Título minimalista
   doc.setFontSize(16);
-  doc.setTextColor(15, 23, 42); // slate-900 (text-primary-dark)
+  doc.setTextColor(15, 23, 42);
   doc.text(`Reporte de Calificaciones - ${courseName}`, 14, 22);
 
   // Extraemos las cabeceras (las llaves del primer objeto) y las filas (los valores)

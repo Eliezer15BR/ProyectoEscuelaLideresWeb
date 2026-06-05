@@ -14,6 +14,7 @@ import { RevisionesScreen } from './features/courses/RevisionesScreen';
 import { PendientesScreen } from './features/courses/PendientesScreen';
 import { UsuariosScreen } from './features/admin/UsuariosScreen';
 import { LogsScreen } from './features/admin/LogsScreen';
+import { CourseStudentsScreen } from './features/admin/CourseStudentsScreen';
 
 export const App = () => {
   const { isAuthenticated, checkAuth, isCheckingAuth } = useAuthStore();
@@ -55,8 +56,7 @@ export const App = () => {
           </ProtectedRoute>
         } />
 
-        {/* --- RUTA BLINDADA (Solo Administradores) --- */}
-        <Route path="/admin" element={
+        <Route path="/cursos" element={
           <ProtectedRoute allowedRoles={['Admin']}>
             <Layout><CourseManagementScreen /></Layout>
           </ProtectedRoute>
@@ -98,6 +98,13 @@ export const App = () => {
             <Layout><LogsScreen /></Layout>
           </ProtectedRoute>
         } />
+        <Route path='/admin/cursos/:id/alumnos' element={
+          <ProtectedRoute allowedRoles={['Admin']}>
+            <Layout>
+              <CourseStudentsScreen/>
+            </Layout>
+          </ProtectedRoute>
+        }/>
         {/* RUTA COMODÍN */}
         <Route path="*" element={<Navigate to="/" replace />} />
 

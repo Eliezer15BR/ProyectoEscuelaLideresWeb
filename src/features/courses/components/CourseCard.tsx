@@ -12,7 +12,6 @@ export const CourseCard = ({course,onClick}: CourseCardProps) => {
     return (
         <div 
             onClick={() => onClick && onClick(course.id_curso)}
-            // Si la tarjeta recibe un onClick, le agregamos el cursor interactivo y una transición sutil
             className={`
                 bg-surface-white rounded-xl p-6 border border-gray-100 shadow-sm flex flex-col h-full
                 ${onClick ? 'cursor-pointer hover:shadow-md hover:border-primary/30 transition-all duration-300' : ''}
@@ -23,10 +22,6 @@ export const CourseCard = ({course,onClick}: CourseCardProps) => {
                 <h3 className="text-lg font-bold text-text-primary leading-tight line-clamp-2">
                 {course.nombre}
                 </h3>
-                {/* Usamos tus colores personalizados para el badge */}
-                <span className="bg-background-light text-primary-dark text-xs font-bold px-2.5 py-1 rounded-full whitespace-nowrap">
-                {course.cupos} cupos
-                </span>
             </div>
 
             {/* Cuerpo: Descripción */}

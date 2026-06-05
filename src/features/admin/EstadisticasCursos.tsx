@@ -23,7 +23,6 @@ export const EstadisticasCursos = () => {
       try {
         const response = await apiClient.get('/curso/estadisticas');
         setEstadisticas(response.data);
-        setCursosSeleccionados(response.data.map((curso: any) => curso.id_curso));
       } catch (error) {
         console.error('Error al cargar estadísticas', error);
       } finally {

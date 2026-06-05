@@ -8,18 +8,25 @@ interface AdminState {
   professors: Professor[];
   isLoadingProfessors: boolean;
   isLoadingStudents: boolean;
-  isLoadingCourses: boolean; // <-- Nuevo estado de carga para los cursos
+  isLoadingCourses: boolean;
   adminError: string | null;
-  
+  currentCourseStudents: any[]; 
+  isLoadingCourseStudents: boolean;
   fetchStudents: () => Promise<void>;
   fetchAllCourses: () => Promise<void>;
   fetchProfessors: () => Promise<void>;
   enrollStudentInCourse: (courseId: number, studentId: number) => Promise<boolean>;
   createCourse: (courseData: Omit<Course, 'id_curso'>) => Promise<boolean>;
   clearAdminError: () => void;
+  fetchCourseStudents: (courseId: number) => Promise<void>;
+  unenrollStudent: (inscripcionId: number) => Promise<boolean>;
+  clearCurrentCourseStudents: () => void;
+  updateCourse: (id: number, courseData: Partial<Course>) => Promise<boolean>;
 }
 
-export const useAdminStore = create<AdminState>((set) => ({
+export const useAdminStore = create<AdminState>((set,get) => ({
+  currentCourseStudents: [],
+  isLoadingCourseStudents: false,
   students: [],
   courses: [],
   isLoadingStudents: false,
@@ -92,5 +99,58 @@ export const useAdminStore = create<AdminState>((set) => ({
         });
         return false;
     }
-  }
+  },
+  fetchCourseStudents: async (courseId: number) => {
+    set({ isLoadingCourseStudents: true, adminError: null });
+    try {
+      const data = await adminService.getCourseStudents(courseId);
+      set({ currentCourseStudents: data, isLoadingCourseStudents: false });
+    } catch (error: any) {
+      set({ 
+        adminError: error.response?.data?.message || 'Error al cargar los inscritos.', 
+        isLoadingCourseStudents: false 
+      });
+    }
+  },
+
+  // 🗑️ DESINSCRIBIR
+  unenrollStudent: async (inscripcionId: number) => {
+    set({ adminError: null });
+    try {
+      await adminService.unenrollStudent(inscripcionId);
+      
+      // Magia de Zustand: Actualizamos el estado local inmediatamente sin volver a consultar al backend
+      const { currentCourseStudents } = get();
+      set({
+        currentCourseStudents: currentCourseStudents.filter(
+          (inscripcion) => inscripcion.id_inscripcion !== inscripcionId
+        )
+      });
+      return true;
+    } catch (error: any) {
+      set({ adminError: error.response?.data?.message || 'Error al desinscribir al estudiante.' });
+      return false;
+    }
+  },
+  clearCurrentCourseStudents: () => set({ currentCourseStudents: [] }),
+  updateCourse: async (id, courseData) => {
+    set({ adminError: null });
+    try {
+      // Asegúrate de tener este método en tu courseService (ej. apiClient.patch(`/curso/${id}`, data))
+      const updatedCourse = await courseService.update(id, courseData);
+      
+      set((state) => ({
+        // Actualizamos el curso en la lista local para no recargar la página
+        courses: state.courses.map((c) => 
+          c.id_curso === id ? { ...c, ...updatedCourse } : c
+        )
+      }));
+      return true;
+    } catch (error: any) {
+      set({
+        adminError: error.response?.data?.message || "No se pudo actualizar el curso."
+      });
+      return false;
+    }
+  },
 }));
