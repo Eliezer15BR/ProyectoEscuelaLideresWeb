@@ -50,7 +50,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onSuccess }: CreateCourseMo
       fecha_inicio: new Date(fechaInicio).toISOString(),
       fecha_fin: new Date(fechaFin).toISOString(),
       id_profesor: Number(idProfesor),
-    });
+    }as any);
 
     setIsLoading(false);
     if (success) {
