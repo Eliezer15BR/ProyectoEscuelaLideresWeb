@@ -112,7 +112,9 @@ export const PublishContentModal = ({ isOpen, onClose, courseId }: PublishConten
               />
             )}
           </div>
-            <InputField
+            {
+              (tipo==='tarea')?(
+                <InputField
                   label="Calificación Máxima"
                   type="number"
                   min={1}
@@ -122,6 +124,9 @@ export const PublishContentModal = ({ isOpen, onClose, courseId }: PublishConten
                   required={tipo === 'tarea'}
                   disabled={isLoading}
                 />
+              ):<></>
+            }
+            
           <div className="pt-4 flex gap-3 justify-end">
             <button
               type="button"

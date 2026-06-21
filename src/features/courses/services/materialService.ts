@@ -25,19 +25,32 @@ export const materialService = {
   },
 
   // 2. Subir múltiples archivos (Hacemos un loop ya que tu backend recibe de a uno)
-  uploadFiles: async (materialId: number, files: File[]) => {
-    // Creamos un arreglo de promesas
-    const uploadPromises = files.map((file) => {
+  uploadFiles: async (materialId: number, files: File[], signal?: AbortSignal, onProgress?: (percent: number) => void) => {
+    const totalBytes = files.reduce((s, f) => s + (f.size || 0), 0);
+    const lastLoaded: number[] = files.map(() => 0);
+    let totalLoaded = 0;
+
+    const uploadPromises = files.map((file, idx) => {
       const formData = new FormData();
       formData.append('file', file); // El interceptor espera 'file'
       formData.append('id_material', String(materialId)); // Tu DTO exige esto
 
       return apiClient.post('/archivo-material', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
+        signal,
+        onUploadProgress: (progressEvent: ProgressEvent) => {
+          const loaded = progressEvent.loaded || 0;
+          const delta = loaded - lastLoaded[idx];
+          lastLoaded[idx] = loaded;
+          totalLoaded += delta;
+          if (onProgress && totalBytes > 0) {
+            const percent = Math.round((totalLoaded / totalBytes) * 100);
+            onProgress(percent);
+          }
+        }
       });
     });
 
-    // Ejecutamos todas las subidas al mismo tiempo
     await Promise.all(uploadPromises);
   },
 

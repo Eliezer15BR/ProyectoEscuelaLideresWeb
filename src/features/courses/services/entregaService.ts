@@ -20,17 +20,29 @@ export const entregaService = {
     await apiClient.delete(`/entrega/${entregaId}`);
   },
   // 3. Subir archivos
-  subirArchivos: async (entregaId: number, files: File[]) => {
-    const uploadPromises = files.map((file) => {
+  subirArchivos: async (entregaId: number, files: File[], signal?: AbortSignal, onProgress?: (percent: number) => void) => {
+    const totalBytes = files.reduce((s, f) => s + (f.size || 0), 0);
+    const lastLoaded: number[] = files.map(() => 0);
+    let totalLoaded = 0;
+
+    const uploadPromises = files.map((file, idx) => {
       const formData = new FormData();
       formData.append('file', file);
-      
-      // OJO AQUÍ: Asumo que tu tabla archivo_entrega pide el id_entrega. 
-      // Si te pide el id_tarea, cámbialo a 'id_tarea'
-      formData.append('id_entrega', String(entregaId)); 
+      formData.append('id_entrega', String(entregaId));
 
       return apiClient.post('/archivo-entrega', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
+        signal,
+        onUploadProgress: (progressEvent: ProgressEvent) => {
+          const loaded = progressEvent.loaded || 0;
+          const delta = loaded - lastLoaded[idx];
+          lastLoaded[idx] = loaded;
+          totalLoaded += delta;
+          if (onProgress && totalBytes > 0) {
+            const percent = Math.round((totalLoaded / totalBytes) * 100);
+            onProgress(percent);
+          }
+        }
       });
     });
 

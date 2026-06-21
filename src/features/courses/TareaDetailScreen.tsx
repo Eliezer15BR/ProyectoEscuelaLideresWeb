@@ -17,12 +17,18 @@ export const TareaDetailScreen = () => {
   
   const [archivosPendientes, setArchivosPendientes] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [profUploadController, setProfUploadController] = useState<AbortController | null>(null);
+  const [profCancelMessage, setProfCancelMessage] = useState<string | null>(null);
+  const [profUploadProgress, setProfUploadProgress] = useState<number>(0);
 
   // Estados de entrega del estudiante
   const [entrega, setEntrega] = useState<any>(null);
   const [archivosEntrega, setArchivosEntrega] = useState<any[]>([]);
   const [archivosSubirAlumno, setArchivosSubirAlumno] = useState<File[]>([]);
   const [isSubiendoAlumno, setIsSubiendoAlumno] = useState(false);
+  const [studentUploadController, setStudentUploadController] = useState<AbortController | null>(null);
+  const [studentCancelMessage, setStudentCancelMessage] = useState<string | null>(null);
+  const [studentUploadProgress, setStudentUploadProgress] = useState<number>(0);
 
   // Estados de edición de la tarea (Profesor/Admin)
   const [isEditing, setIsEditing] = useState(false);
@@ -141,14 +147,27 @@ export const TareaDetailScreen = () => {
   const handleUploadFiles = async () => {
     if (archivosPendientes.length === 0 || !taskId) return;
     setIsUploading(true);
+    const controller = new AbortController();
+    setProfUploadController(controller);
+    setProfUploadProgress(0);
     try {
-      await tareaService.uploadFiles(Number(taskId), archivosPendientes);
+      await tareaService.uploadFiles(Number(taskId), archivosPendientes, controller.signal, (pct) => setProfUploadProgress(pct));
       await loadTarea();
       setArchivosPendientes([]);
-    } catch (error) {
-      alert('Error al subir los archivos.');
+    } catch (error: any) {
+      // Treat abort as cancel; show transient message
+      if (error?.code === 'ERR_CANCELED' || error?.name === 'CanceledError' || error?.name === 'AbortError') {
+        setProfCancelMessage('Subida cancelada');
+        setTimeout(() => setProfCancelMessage(null), 5000);
+        await loadTarea();
+      } else {
+        console.error(error);
+        alert('Error al subir los archivos.');
+      }
     } finally {
       setIsUploading(false);
+      setProfUploadController(null);
+      setProfUploadProgress(0);
     }
   };
 
@@ -175,6 +194,9 @@ export const TareaDetailScreen = () => {
   const handleSubmitEntrega = async () => {
     if (!taskId) return;
     setIsSubiendoAlumno(true);
+    const controller = new AbortController();
+    setStudentUploadController(controller);
+    setStudentUploadProgress(0);
     try {
       let currentEntregaId = entrega?.id || entrega?.id_entrega;
 
@@ -185,16 +207,25 @@ export const TareaDetailScreen = () => {
       }
 
       if (archivosSubirAlumno.length > 0 && currentEntregaId) {
-        await entregaService.subirArchivos(currentEntregaId, archivosSubirAlumno);
+        await entregaService.subirArchivos(currentEntregaId, archivosSubirAlumno, controller.signal, (pct) => setStudentUploadProgress(pct));
         setArchivosSubirAlumno([]);
       }
 
       await loadTarea(); 
     } catch (error) {
-      console.error(error);
-      alert('Error al realizar la entrega.');
+      // cancellation handling
+      if ((error as any)?.code === 'ERR_CANCELED' || (error as any)?.name === 'CanceledError' || (error as any)?.name === 'AbortError') {
+        setStudentCancelMessage('Subida cancelada');
+        setTimeout(() => setStudentCancelMessage(null), 5000);
+        await loadTarea();
+      } else {
+        console.error(error);
+        alert('Error al realizar la entrega.');
+      } 
     } finally {
       setIsSubiendoAlumno(false);
+      setStudentUploadController(null);
+      setStudentUploadProgress(0);
     }
   };
 
@@ -378,7 +409,34 @@ export const TareaDetailScreen = () => {
                     </li>
                   ))}
                 </ul>
-                <Button onClick={handleUploadFiles} isLoading={isUploading} fullWidth>⬆️ Subir instrucciones al servidor</Button>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1">
+                    <Button onClick={handleUploadFiles} isLoading={isUploading} fullWidth>⬆️ Subir instrucciones al servidor</Button>
+                  </div>
+                  {isUploading && profUploadController && (
+                    <button
+                      onClick={() => {
+                        profUploadController.abort();
+                        setProfCancelMessage('Subida cancelada');
+                        setTimeout(() => setProfCancelMessage(null), 5000);
+                      }}
+                      className="px-3 py-2 bg-white border border-red-200 text-red-600 rounded-xl text-sm font-bold"
+                    >
+                      Cancelar subida
+                    </button>
+                  )}
+                </div>
+                {isUploading && (
+                  <div className="mt-3">
+                    <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                      <div className="bg-orange-500 h-2" style={{ width: `${profUploadProgress}%` }}></div>
+                    </div>
+                    <div className="text-sm text-text-secondary mt-2 font-medium">{profUploadProgress}%</div>
+                  </div>
+                )}
+                {profCancelMessage && (
+                  <div className="mt-3 text-sm text-red-600 font-bold">{profCancelMessage}</div>
+                )}
               </div>
             )}
           </div>
@@ -487,19 +545,45 @@ export const TareaDetailScreen = () => {
                     </ul>
                   </div>
                 )}
-
                 <div className="pt-2">
-                  <Button 
-                    onClick={handleSubmitEntrega} 
-                    isLoading={isSubiendoAlumno} 
-                    fullWidth
-                    disabled={tieneEntregaActiva && archivosSubirAlumno.length === 0}
-                  >
-                    {archivosSubirAlumno.length > 0 
-                      ? `🚀 Entregar con ${archivosSubirAlumno.length} archivo(s)` 
-                      : (tieneEntregaActiva ? '✅ Tarea Entregada' : '✔ Marcar como completada (Sin archivos)')
-                    }
-                  </Button>
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1">
+                      <Button 
+                        onClick={handleSubmitEntrega} 
+                        isLoading={isSubiendoAlumno} 
+                        fullWidth
+                        disabled={tieneEntregaActiva && archivosSubirAlumno.length === 0}
+                      >
+                        {archivosSubirAlumno.length > 0 
+                          ? `🚀 Entregar con ${archivosSubirAlumno.length} archivo(s)` 
+                          : (tieneEntregaActiva ? '✅ Tarea Entregada' : '✔ Marcar como completada (Sin archivos)')
+                        }
+                      </Button>
+                    </div>
+                    {isSubiendoAlumno && studentUploadController && (
+                      <button
+                        onClick={() => {
+                          studentUploadController.abort();
+                          setStudentCancelMessage('Subida cancelada');
+                          setTimeout(() => setStudentCancelMessage(null), 5000);
+                        }}
+                        className="px-3 py-2 bg-white border border-red-200 text-red-600 rounded-xl text-sm font-bold"
+                      >
+                        Cancelar subida
+                      </button>
+                    )}
+                  </div>
+                  {isSubiendoAlumno && (
+                    <div className="mt-3">
+                      <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                        <div className="bg-green-500 h-2" style={{ width: `${studentUploadProgress}%` }}></div>
+                      </div>
+                      <div className="text-sm text-text-secondary mt-2 font-medium">{studentUploadProgress}%</div>
+                    </div>
+                  )}
+                  {studentCancelMessage && (
+                    <div className="mt-3 text-sm text-red-600 font-bold">{studentCancelMessage}</div>
+                  )}
                 </div>
               </div>
             )}

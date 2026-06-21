@@ -16,6 +16,9 @@ export const MaterialDetailScreen = () => {
   // NUEVO: Ahora es un arreglo de archivos
   const [archivosPendientes, setArchivosPendientes] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadController, setUploadController] = useState<AbortController | null>(null);
+  const [cancelMessage, setCancelMessage] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
   
   const [isEditing, setIsEditing] = useState(false);
   const [editTitulo, setEditTitulo] = useState('');
@@ -60,7 +63,7 @@ export const MaterialDetailScreen = () => {
       alert('Hubo un error al actualizar el material.');
     } finally {
       setIsSaving(false);
-    }
+    } 
   };
 
   const handleDelete = async () => {
@@ -92,20 +95,31 @@ export const MaterialDetailScreen = () => {
   const handleUploadFiles = async () => {
     if (archivosPendientes.length === 0 || !materialId) return;
     setIsUploading(true);
+    const controller = new AbortController();
+    setUploadController(controller);
+    setUploadProgress(0);
     try {
-      // Usamos el nuevo servicio que dispara las peticiones en paralelo
-      await materialService.uploadFiles(Number(materialId), archivosPendientes);
-      
+      await materialService.uploadFiles(Number(materialId), archivosPendientes, controller.signal, (pct) => setUploadProgress(pct));
+
       // Recargamos SOLO los archivos para no pedir todo el material de nuevo
       const nuevosArchivos = await materialService.getFiles(materialId);
       setArchivosDelServidor(nuevosArchivos);
-      
+
       setArchivosPendientes([]); // Limpiamos la bandeja
-    } catch (error) {
-      console.error(error);
-      alert('Error al subir algunos archivos.');
+    } catch (error: any) {
+      if (error?.code === 'ERR_CANCELED' || error?.name === 'CanceledError' || error?.name === 'AbortError') {
+        setCancelMessage('Subida cancelada');
+        setTimeout(() => setCancelMessage(null), 5000);
+        const nuevosArchivos = await materialService.getFiles(materialId);
+        setArchivosDelServidor(nuevosArchivos);
+      } else {
+        console.error(error);
+        alert('Error al subir algunos archivos.');
+      }
     } finally {
       setIsUploading(false);
+      setUploadController(null);
+      setUploadProgress(0);
     }
   };
 
@@ -227,9 +241,36 @@ export const MaterialDetailScreen = () => {
                     </li>
                   ))}
                 </ul>
-                <Button onClick={handleUploadFiles} isLoading={isUploading} fullWidth>
-                  ⬆️ Subir {archivosPendientes.length} archivo(s) al servidor
-                </Button>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1">
+                    <Button onClick={handleUploadFiles} isLoading={isUploading} fullWidth>
+                      ⬆️ Subir {archivosPendientes.length} archivo(s) al servidor
+                    </Button>
+                  </div>
+                  {isUploading && uploadController && (
+                    <button
+                      onClick={() => {
+                        uploadController.abort();
+                        setCancelMessage('Subida cancelada');
+                        setTimeout(() => setCancelMessage(null), 5000);
+                      }}
+                      className="px-3 py-2 bg-white border border-red-200 text-red-600 rounded-xl text-sm font-bold"
+                    >
+                      Cancelar subida
+                    </button>
+                  )}
+                </div>
+                {isUploading && (
+                  <div className="mt-3">
+                    <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                      <div className="bg-blue-500 h-2" style={{ width: `${uploadProgress}%` }}></div>
+                    </div>
+                    <div className="text-sm text-text-secondary mt-2 font-medium">{uploadProgress}%</div>
+                  </div>
+                )}
+                {cancelMessage && (
+                  <div className="mt-3 text-sm text-red-600 font-bold">{cancelMessage}</div>
+                )}
               </div>
             )}
             

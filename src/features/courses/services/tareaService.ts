@@ -23,16 +23,32 @@ export const tareaService = {
     return response.data;
   },
 
-  uploadFiles: async (tareaId: number, files: File[]) => {
-    const uploadPromises = files.map((file) => {
+  uploadFiles: async (tareaId: number, files: File[], signal?: AbortSignal, onProgress?: (percent: number) => void) => {
+    const totalBytes = files.reduce((s, f) => s + (f.size || 0), 0);
+    const lastLoaded: number[] = files.map(() => 0);
+    let totalLoaded = 0;
+
+    const uploadPromises = files.map((file, idx) => {
       const formData = new FormData();
-      formData.append('file', file); 
-      formData.append('id_tarea', String(tareaId)); // Tu DTO de archivo-tarea exigirá esto
+      formData.append('file', file);
+      formData.append('id_tarea', String(tareaId));
 
       return apiClient.post('/archivo-tarea', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
+        signal,
+        onUploadProgress: (progressEvent: ProgressEvent) => {
+          const loaded = progressEvent.loaded || 0;
+          const delta = loaded - lastLoaded[idx];
+          lastLoaded[idx] = loaded;
+          totalLoaded += delta;
+          if (onProgress && totalBytes > 0) {
+            const percent = Math.round((totalLoaded / totalBytes) * 100);
+            onProgress(percent);
+          }
+        }
       });
     });
+
     await Promise.all(uploadPromises);
   },
 
