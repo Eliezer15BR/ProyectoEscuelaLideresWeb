@@ -36,7 +36,7 @@ export const tareaService = {
       return apiClient.post('/archivo-tarea', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
         signal,
-        onUploadProgress: (progressEvent: ProgressEvent) => {
+        onUploadProgress: (progressEvent) => {
           const loaded = progressEvent.loaded || 0;
           const delta = loaded - lastLoaded[idx];
           lastLoaded[idx] = loaded;

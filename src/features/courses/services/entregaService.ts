@@ -33,7 +33,7 @@ export const entregaService = {
       return apiClient.post('/archivo-entrega', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
         signal,
-        onUploadProgress: (progressEvent: ProgressEvent) => {
+        onUploadProgress: (progressEvent) => {
           const loaded = progressEvent.loaded || 0;
           const delta = loaded - lastLoaded[idx];
           lastLoaded[idx] = loaded;
