@@ -28,7 +28,7 @@ export const MaterialDetailScreen = () => {
   const canManage = user?.rol === 'Admin' || user?.rol === 'Profesor';
 
   const loadMaterial = async () => {
-    if (!materialId) return;
+    if (!materialId) return; 
     try {
       // Pedimos el material por un lado y los archivos por el otro (en paralelo)
       const [dataMaterial, dataArchivos] = await Promise.all([
