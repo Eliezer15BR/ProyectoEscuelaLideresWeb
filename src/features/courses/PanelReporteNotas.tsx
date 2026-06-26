@@ -39,40 +39,27 @@ export const PanelReporteNotas = ({ cursoId, cursoNombre }: Props) => {
   // 📭 ESTADO VACÍO
   if (datosReporte.length === 0) {
     return (
-      <div className="p-8 text-center bg-surface-white rounded-2xl border border-gray-100 shadow-sm text-text-secondary">
-        <span className="text-4xl block mb-3">📭</span>
-        <p>No hay estudiantes inscritos o datos disponibles para generar el reporte.</p>
+      <div className="text-center p-4 text-text-secondary">
+        <span className="text-2xl block mb-2">📭</span>
+        <p className="text-xs">Sin datos para reporte.</p>
       </div>
     );
   }
   return (
-    <div className="bg-surface-white p-6 rounded-2xl border border-gray-100 shadow-sm animate-fade-in">
-      
-      {/* --- CABECERA Y BOTONES --- */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h2 className="text-xl font-bold text-text-primary">Calificaciones del Curso</h2>
-          <p className="text-sm text-text-secondary">Exportación de notas.</p>
-        </div>
+    <div className="flex flex-col gap-3 animate-fade-in">
+      <button
+        onClick={() => exportToExcel(datosReporte, cursoNombre)}
+        className="flex items-center justify-center gap-2 w-full py-2 text-sm font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-colors"
+      >
+        <span>📗</span> Exportar Excel
+      </button>
 
-        {/* 🖨️ BOTONES DE EXPORTACIÓN */}
-        <div className="flex gap-3">
-          <button
-            onClick={() => exportToExcel(datosReporte, cursoNombre)}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl transition-all shadow-sm active:scale-95 cursor-pointer"
-          >
-            <span className="text-lg">📗</span> Excel
-          </button>
-
-          <button
-            onClick={() => exportToPDF(datosReporte, cursoNombre)}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl transition-all shadow-sm active:scale-95 cursor-pointer"
-          >
-            <span className="text-lg">📄</span> PDF
-          </button>
-        </div>
-      </div>
-
+      <button
+        onClick={() => exportToPDF(datosReporte, cursoNombre)}
+        className="flex items-center justify-center gap-2 w-full py-2 text-sm font-bold text-red-700 bg-red-50 hover:bg-red-100 rounded-xl transition-colors"
+      >
+        <span>📄</span> Exportar PDF
+      </button>
     </div>
   );
 };

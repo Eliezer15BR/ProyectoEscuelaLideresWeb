@@ -22,17 +22,17 @@ export const TextArea = ({
             id={inputId}
             rows={rows}
             className={`
-            px-4 py-2.5 rounded-lg border bg-gray-50 text-gray-900 resize-y
-            transition-colors duration-200 focus:outline-none focus:bg-white focus:ring-2 
+            px-4 py-2.5 rounded-xl border bg-gray-50/50 text-text-primary resize-y
+            transition-all duration-300 focus:outline-none focus:bg-surface-white focus:ring-2 
             ${error 
-                ? 'border-red-500 focus:ring-red-200' 
-                : 'border-gray-300 focus:border-blue-500 focus:ring-blue-100'
+                ? 'border-error focus:border-error focus:ring-error/20' 
+                : 'border-gray-200 focus:border-primary focus:ring-primary/20 hover:border-secondary/50'
             }
             disabled:opacity-60 disabled:bg-gray-100 disabled:cursor-not-allowed
             `}
             {...props}
         />
-        {error && <span className="text-sm text-red-500 font-medium">{error}</span>}
+        {error && <span className="text-sm text-error font-medium">{error}</span>}
         </div>
     );
 };

@@ -52,23 +52,24 @@ export const LoginScreen = () => {
     };
 
     return (
-        <div className="min-h-screen bg-primary flex flex-col justify-center py-2 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-gradient-to-br from-primary-dark via-primary to-secondary flex flex-col justify-center py-2 sm:px-6 lg:px-8">
         
-        <div className="sm:mx-auto w-full max-w-md flex flex-col items-center">
-            <LogoInst className='bg-pink-900 flex justify-center items-center m-auto w-45 rounded-4xl'/>
+        <div className="sm:mx-auto w-full max-w-md flex flex-col items-center mb-6">
+            <div className="bg-surface-white/10 p-4 rounded-3xl backdrop-blur-md shadow-xl border border-white/20">
+                <LogoInst className="flex justify-center items-center m-auto w-40"/>
+            </div>
         </div>
 
         <div className="mt-8 sm:mx-auto w-full max-w-md px-4 sm:px-0">
             {/* Nuestro componente Card conteniendo el formulario */}
-            <Card>
-            <p className="mb-4 text-2xl text-black">
-                Iniciar sesión
-            </p>
+            <Card className="bg-surface-white shadow-2xl">
+            <h2 className="mb-6 text-2xl font-black text-text-primary text-center">
+                Bienvenido de nuevo
+            </h2>
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
                 
-                {/* Si hay un error general de la API, lo mostramos arriba */}
                 {formError && (
-                <div className="p-3 bg-red-50 border border-red-200 text-red-600 text-sm font-medium rounded-lg animate-fade-in">
+                <div className="p-3 bg-error/10 border border-error/20 text-error text-sm font-medium rounded-xl animate-fade-in text-center">
                     {formError}
                 </div>
                 )}

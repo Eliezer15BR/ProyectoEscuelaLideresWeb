@@ -49,72 +49,82 @@ export const CourseDetailScreen = () => {
   return (
     <div className="flex flex-col gap-6 animate-fade-in pb-10">
       
-      {/* Botón de retroceso sutil */}
-      <div>
-        <button 
-          onClick={() => navigate('/clases')}
-          className="text-text-secondary hover:text-primary transition-colors flex items-center gap-2 font-medium mb-4"
-        >
-          <span>←</span> Volver a mis clases
-        </button>
-      </div>
+      {/* Cabecera del Curso (Banner Estilo Classroom) */}
+      <div className="bg-gradient-to-r from-primary-dark via-primary to-secondary rounded-3xl p-8 md:p-10 shadow-xl flex flex-col justify-end min-h-[260px] relative overflow-hidden mb-6">
+        {/* Círculos decorativos de fondo para darle el toque premium */}
+        <div className="absolute -top-24 -right-10 w-72 h-72 rounded-full bg-white opacity-10"></div>
+        <div className="absolute top-20 right-40 w-32 h-32 rounded-full bg-white opacity-5"></div>
 
-      {/* Cabecera del Curso */}
-      <div className="bg-surface-white rounded-2xl p-8 border border-gray-100 shadow-sm">
-        <div className="flex justify-between items-start gap-4">
-          <div>
-            <h1 className="text-3xl font-extrabold text-primary-dark tracking-tight mb-2">
-              {currentCourse.nombre}
-            </h1>
-            <p className="text-text-secondary text-lg max-w-3xl">
-              {currentCourse.descripcion}
-            </p>
-            <p className='text-text-secondary text-lg max-w-3xl'>
-              Profesor: {currentCourse.profesor.nombre}
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-8 flex gap-8 border-t border-gray-50 pt-6">
-          <div>
-            <p className="text-xs text-text-secondary font-bold uppercase tracking-wider mb-1">Fecha de Inicio</p>
-            <p className="text-text-primary font-medium">{formatDate(currentCourse.fecha_inicio)}</p>
-          </div>
-          <div>
-            <p className="text-xs text-text-secondary font-bold uppercase tracking-wider mb-1">Fecha de Fin</p>
-            <p className="text-text-primary font-medium">{formatDate(currentCourse.fecha_fin)}</p>
+        <div className="relative z-10">
+          <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight mb-4 drop-shadow-lg">
+            {currentCourse.nombre}
+          </h1>
+          <div className="flex items-center gap-3">
+             <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-md">
+               <span className="text-primary font-black text-lg">{currentCourse.profesor.nombre.charAt(0)}</span>
+             </div>
+             <div>
+               <p className="text-white text-lg font-medium drop-shadow-md leading-tight">
+                 {currentCourse.profesor.nombre}
+               </p>
+               {/* Fechas trasladadas al banner de forma sutil */}
+               <p className="text-white/80 text-sm font-medium mt-1">
+                 {formatDate(currentCourse.fecha_inicio)} – {formatDate(currentCourse.fecha_fin)}
+               </p>
+             </div>
           </div>
         </div>
       </div>
 
-      {/* --- 📊 PANEL DE REPORTES (SOLO PROFESOR / ADMIN) --- */}
-      {/* Lo colocamos aquí arriba para que sea de fácil acceso para el docente */}
-      {canPublish && currentCourse && (
-        <PanelReporteNotas 
-          cursoId={currentCourse.id_curso} 
-          cursoNombre={currentCourse.nombre} 
-        />
-      )}
-
-      {/* Aquí abajo irá el contenido dinámico (Tareas, Alumnos, etc.) */}
-      <div className="mt-8">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-text-primary flex items-center gap-2">
-            <span>⚡ Actividad del Curso</span>
-          </h2>
+      {/* CONTENIDO PRINCIPAL (Diseño 2 columnas en escritorio) */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        
+        {/* --- COLUMNA IZQUIERDA (Info y Reportes) --- */}
+        <div className="lg:col-span-1 flex flex-col gap-6">
           
-          {canPublish && (
-            <button 
-              onClick={() => setIsPublishModalOpen(true)}
-              className="bg-primary text-surface-white font-bold px-5 py-2.5 rounded-xl text-sm btn-animated shadow-sm flex items-center gap-2"
-            >
-              <span className="text-lg leading-none">+</span> Crear Publicación
-            </button>
+          {/* Descripción del Curso */}
+          {currentCourse.descripcion && (
+            <div className="bg-surface-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+              <h3 className="text-sm font-bold text-primary-dark mb-2">Acerca de la clase</h3>
+              <p className="text-text-secondary text-sm leading-relaxed">
+                {currentCourse.descripcion}
+              </p>
+            </div>
           )}
+
+          {/* Panel de Reportes (Solo Profesores) */}
+          {canPublish && (
+            <div className="bg-surface-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+              <h3 className="text-sm font-bold text-primary-dark mb-3">Reportes del Curso</h3>
+              <PanelReporteNotas 
+                cursoId={currentCourse.id_curso} 
+                cursoNombre={currentCourse.nombre} 
+              />
+            </div>
+          )}
+
         </div>
 
-        {/* FEED DE ACTIVIDAD */}
-        {currentCourse && <CourseFeed courseId={currentCourse.id_curso} />}
+        {/* --- COLUMNA DERECHA (Feed Principal) --- */}
+        <div className="lg:col-span-3">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-bold text-text-primary flex items-center gap-2">
+              <span>Actividad de la Clase</span>
+            </h2>
+            
+            {canPublish && (
+              <button 
+                onClick={() => setIsPublishModalOpen(true)}
+                className="bg-primary text-surface-white font-bold px-5 py-2.5 rounded-xl text-sm btn-animated shadow-sm flex items-center gap-2"
+              >
+                <span className="text-lg leading-none">+</span> Crear Publicación
+              </button>
+            )}
+          </div>
+
+          {/* FEED DE ACTIVIDAD */}
+          {currentCourse && <CourseFeed courseId={currentCourse.id_curso} />}
+        </div>
       </div>
 
       {/* MODAL DE PUBLICACIÓN */}

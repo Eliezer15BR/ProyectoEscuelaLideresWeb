@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { tareaService } from './services/tareaService';
 import { entregaService } from './services/entregaService';
 import { Button } from '../../components/Button';
@@ -117,8 +117,7 @@ const SubmissionCard = ({
 
 // --- PANTALLA PRINCIPAL ---
 export const RevisionesScreen = () => {
-  const { id: courseId, taskId } = useParams<{ id: string, taskId: string }>();
-  const navigate = useNavigate();
+  const { taskId } = useParams<{ id: string, taskId: string }>();
   
   const [tarea, setTarea] = useState<any>(null);
   const [entregas, setEntregas] = useState<any[]>([]);
@@ -167,18 +166,15 @@ export const RevisionesScreen = () => {
 
   return (
     <div className="flex flex-col gap-6 relative animate-fade-in pb-10">
-      <div>
-        <button onClick={() => navigate(`/clases/${courseId}/tarea/${taskId}`)} className="text-text-secondary hover:text-primary transition-colors flex items-center gap-2 font-medium">
-          <span>←</span> Volver a la Tarea
-        </button>
-      </div>
 
-      <div className="bg-surface-white rounded-2xl p-8 border border-gray-100 shadow-sm relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-2 bg-orange-400"></div>
-        <h1 className="text-2xl font-extrabold text-primary-dark mb-2">Revisiones: {tarea?.titulo}</h1>
-        <p className="text-sm text-text-secondary">
-          Tienes {entregas.length} entrega(s) en total.
-        </p>
+      <div className="bg-surface-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-[0_4px_20px_rgb(0,0,0,0.03)] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-black text-primary-dark mb-1">Revisiones</h1>
+          <p className="text-text-secondary font-medium text-lg">{tarea?.titulo}</p>
+        </div>
+        <div className="bg-primary/10 px-5 py-3 rounded-xl border border-primary/20">
+           <span className="text-primary-dark font-black text-sm uppercase tracking-wider">{entregas.length} Entregas en total</span>
+        </div>
       </div>
 
       <div className="space-y-4">

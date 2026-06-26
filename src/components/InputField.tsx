@@ -37,12 +37,12 @@ export const InputField = ({
                     {...props} // Pasamos todas las props primero
                     type={tipoInputFinal} // IMPORTANTE: Sobrescribimos el type al final
                     className={`
-                        w-full px-4 py-2.5 rounded-lg border bg-gray-50 text-gray-900 
-                        transition-colors duration-200 focus:outline-none focus:bg-white focus:ring-2 
+                        w-full px-4 py-2.5 rounded-xl border bg-gray-50/50 text-text-primary 
+                        transition-all duration-300 focus:outline-none focus:bg-surface-white focus:ring-2 
                         ${esTipoPassword ? 'pr-12' : ''} /* Padding derecho si es password para no pisar el ícono */
                         ${error 
-                            ? 'border-red-500 focus:ring-red-200' // Estilos de error
-                            : 'border-gray-300 focus:border-blue-500 focus:ring-blue-100' // Estilos normales
+                            ? 'border-error focus:border-error focus:ring-error/20' // Estilos de error
+                            : 'border-gray-200 focus:border-primary focus:ring-primary/20 hover:border-secondary/50' // Estilos normales
                         }
                         disabled:opacity-60 disabled:bg-gray-100 disabled:cursor-not-allowed
                     `}
@@ -53,7 +53,7 @@ export const InputField = ({
                     <button
                         type="button"
                         onClick={() => setMostrarPassword(!mostrarPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-500 focus:outline-none transition-colors"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-primary focus:outline-none transition-colors"
                         title={mostrarPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                     >
                         {mostrarPassword ? (
@@ -73,7 +73,7 @@ export const InputField = ({
             </div>
 
             {error && (
-                <span className="text-sm text-red-500 font-medium">
+                <span className="text-sm text-error font-medium">
                     {error}
                 </span>
             )}

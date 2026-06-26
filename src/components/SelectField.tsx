@@ -41,9 +41,9 @@ export const SelectField = ({ label, options, value, onChange, placeholder = 'Se
       <div
         onClick={() => !disabled && setIsOpen(!isOpen)}
         className={`
-          flex items-center justify-between w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm transition-all cursor-pointer select-none
-          ${disabled ? 'opacity-60 cursor-not-allowed' : 'hover:border-primary/30'}
-          ${isOpen ? 'border-primary/50 ring-2 ring-primary/10' : ''}
+          flex items-center justify-between w-full px-4 py-2.5 bg-gray-50/50 border border-gray-200 rounded-xl text-sm transition-all cursor-pointer select-none
+          ${disabled ? 'opacity-60 cursor-not-allowed' : 'hover:border-secondary/50'}
+          ${isOpen ? 'border-primary bg-surface-white ring-2 ring-primary/20' : ''}
         `}
       >
         <span className={selectedOption ? 'text-text-primary' : 'text-text-secondary'}>
@@ -61,7 +61,7 @@ export const SelectField = ({ label, options, value, onChange, placeholder = 'Se
 
       {/* El menú desplegable flotante */}
       {isOpen && !disabled && (
-        <div className="absolute z-50 w-full mt-2 bg-surface-white border border-gray-100 rounded-xl shadow-lg max-h-48 overflow-y-auto animate-fade-in-up py-1">
+        <div className="absolute z-50 w-full mt-2 bg-surface-white border border-gray-100 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] max-h-48 overflow-y-auto animate-fade-in-up py-1">
           {options.length === 0 ? (
             <div className="px-4 py-3 text-sm text-text-secondary text-center">No hay opciones</div>
           ) : (

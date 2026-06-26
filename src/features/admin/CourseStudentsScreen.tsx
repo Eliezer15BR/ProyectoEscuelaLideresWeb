@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import { EnrollStudentModal } from './components/EnrollStudentModal';
 import { useAdminStore } from './hooks/useAdminStore';
 
 export const CourseStudentsScreen = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
+
   
   const { 
     currentCourseStudents, 
@@ -46,16 +46,6 @@ export const CourseStudentsScreen = () => {
 
   return (
     <div className="flex flex-col gap-6 animate-fade-in pb-10">
-      
-      {/* --- BOTÓN DE RETROCESO --- */}
-      <div>
-        <button 
-          onClick={() => navigate('/cursos')}
-          className="text-text-secondary hover:text-primary transition-colors flex items-center gap-2 font-medium"
-        >
-          <span>←</span> Volver a Gestión de Cursos
-        </button>
-      </div>
 
       {/* --- CABECERA Y CONTROLES --- */}
       <div className="bg-surface-white rounded-2xl p-6 border border-gray-100 shadow-sm flex flex-col md:flex-row md:justify-between md:items-center gap-4">

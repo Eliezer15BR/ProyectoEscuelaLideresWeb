@@ -11,14 +11,14 @@ export const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-opacity">
         {/* Contenedor del Modal */}
-        <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-fade-in-up">
+        <div className="bg-surface-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-fade-in-up">
             
             {/* Cabecera */}
             <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-            <h3 className="text-lg font-bold text-gray-800">{title}</h3>
+            <h3 className="text-lg font-bold text-text-primary">{title}</h3>
             <button 
                 onClick={onClose}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-text-secondary hover:text-error transition-colors"
             >
                 ✕
             </button>

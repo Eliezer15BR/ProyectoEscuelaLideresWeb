@@ -55,10 +55,10 @@ export const LogsScreen = () => {
   if (isLoading) return <div className="flex justify-center p-12"><div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div></div>;
 
   return (
-    <div className="max-w-7xl mx-auto py-6 animate-fade-in pb-10">
+    <div className="flex flex-col gap-6 relative animate-fade-in pb-10">
       
       {/* CABECERA */}
-      <div className="mb-8">
+      <div>
         <h1 className="text-2xl font-extrabold text-primary-dark">Bitácora de Accesos</h1>
         <p className="text-sm text-text-secondary mt-1">
           Registro de auditoría de ingresos y salidas del sistema.

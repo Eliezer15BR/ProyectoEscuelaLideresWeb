@@ -15,12 +15,12 @@ export const Button = ({
     ...props // Captura cualquier otra propiedad nativa (onClick, type, etc.)
 }: ButtonProps) => {
   // 2. Diccionario de estilos base para mantener el diseño minimalista
-    const baseStyles = "relative inline-flex items-center justify-center px-6 py-2.5 text-sm font-medium tracking-wide rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed";
+    const baseStyles = "relative inline-flex items-center justify-center px-6 py-2.5 text-sm font-medium tracking-wide rounded-lg transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100";
   // 3. Estilos específicos según la variante
     const variants = {
-        primary: "bg-primary text-white hover:bg-blue-700 focus:ring-blue-500 border border-transparent",
-        secondary: "bg-white text-gray-700 hover:bg-gray-50 focus:ring-gray-500 border border-gray-300",
-        danger: "bg-red-500 text-white hover:bg-red-600 focus:ring-red-500 border border-transparent",
+        primary: "bg-primary text-white hover:bg-primary-dark focus:ring-primary border border-transparent shadow-md shadow-primary/20",
+        secondary: "bg-surface-white text-primary hover:bg-background-light focus:ring-secondary border border-secondary shadow-sm shadow-secondary/20",
+        danger: "bg-error text-white hover:bg-red-700 focus:ring-error border border-transparent shadow-md shadow-error/20",
     };
 
   // 4. Combinamos todas las clases

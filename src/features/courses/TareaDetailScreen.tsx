@@ -5,6 +5,7 @@ import { tareaService } from './services/tareaService';
 import { entregaService } from './services/entregaService';
 import { Button } from '../../components/Button';
 import { InputField } from '../../components/InputField';
+import { Modal } from '../../components/Modal';
 
 export const TareaDetailScreen = () => {
   const { id: courseId, taskId } = useParams<{ id: string, taskId: string }>();
@@ -16,9 +17,7 @@ export const TareaDetailScreen = () => {
   const [isLoading, setIsLoading] = useState(true);
   
   const [archivosPendientes, setArchivosPendientes] = useState<File[]>([]);
-  const [isUploading, setIsUploading] = useState(false);
-  const [profUploadController, setProfUploadController] = useState<AbortController | null>(null);
-  const [profCancelMessage, setProfCancelMessage] = useState<string | null>(null);
+  const [isProfUploading, setIsProfUploading] = useState(false);
   const [profUploadProgress, setProfUploadProgress] = useState<number>(0);
 
   // Estados de entrega del estudiante
@@ -26,9 +25,7 @@ export const TareaDetailScreen = () => {
   const [archivosEntrega, setArchivosEntrega] = useState<any[]>([]);
   const [archivosSubirAlumno, setArchivosSubirAlumno] = useState<File[]>([]);
   const [isSubiendoAlumno, setIsSubiendoAlumno] = useState(false);
-  const [studentUploadController, setStudentUploadController] = useState<AbortController | null>(null);
-  const [studentCancelMessage, setStudentCancelMessage] = useState<string | null>(null);
-  const [studentUploadProgress, setStudentUploadProgress] = useState<number>(0);
+
 
   // Estados de edición de la tarea (Profesor/Admin)
   const [isEditing, setIsEditing] = useState(false);
@@ -146,9 +143,8 @@ export const TareaDetailScreen = () => {
 
   const handleUploadFiles = async () => {
     if (archivosPendientes.length === 0 || !taskId) return;
-    setIsUploading(true);
+    setIsProfUploading(true);
     const controller = new AbortController();
-    setProfUploadController(controller);
     setProfUploadProgress(0);
     try {
       await tareaService.uploadFiles(Number(taskId), archivosPendientes, controller.signal, (pct) => setProfUploadProgress(pct));
@@ -157,16 +153,13 @@ export const TareaDetailScreen = () => {
     } catch (error: any) {
       // Treat abort as cancel; show transient message
       if (error?.code === 'ERR_CANCELED' || error?.name === 'CanceledError' || error?.name === 'AbortError') {
-        setProfCancelMessage('Subida cancelada');
-        setTimeout(() => setProfCancelMessage(null), 5000);
         await loadTarea();
       } else {
         console.error(error);
         alert('Error al subir los archivos.');
       }
     } finally {
-      setIsUploading(false);
-      setProfUploadController(null);
+      setIsProfUploading(false);
       setProfUploadProgress(0);
     }
   };
@@ -195,8 +188,6 @@ export const TareaDetailScreen = () => {
     if (!taskId) return;
     setIsSubiendoAlumno(true);
     const controller = new AbortController();
-    setStudentUploadController(controller);
-    setStudentUploadProgress(0);
     try {
       let currentEntregaId = entrega?.id || entrega?.id_entrega;
 
@@ -207,7 +198,7 @@ export const TareaDetailScreen = () => {
       }
 
       if (archivosSubirAlumno.length > 0 && currentEntregaId) {
-        await entregaService.subirArchivos(currentEntregaId, archivosSubirAlumno, controller.signal, (pct) => setStudentUploadProgress(pct));
+        await entregaService.subirArchivos(currentEntregaId, archivosSubirAlumno, controller.signal, () => {});
         setArchivosSubirAlumno([]);
       }
 
@@ -215,8 +206,6 @@ export const TareaDetailScreen = () => {
     } catch (error) {
       // cancellation handling
       if ((error as any)?.code === 'ERR_CANCELED' || (error as any)?.name === 'CanceledError' || (error as any)?.name === 'AbortError') {
-        setStudentCancelMessage('Subida cancelada');
-        setTimeout(() => setStudentCancelMessage(null), 5000);
         await loadTarea();
       } else {
         console.error(error);
@@ -224,8 +213,6 @@ export const TareaDetailScreen = () => {
       } 
     } finally {
       setIsSubiendoAlumno(false);
-      setStudentUploadController(null);
-      setStudentUploadProgress(0);
     }
   };
 
@@ -275,321 +262,262 @@ export const TareaDetailScreen = () => {
   const fechaMinima = now.toISOString().slice(0,16);
   return (
     <div className="flex flex-col gap-6 relative animate-fade-in pb-10">
-      
-      <div>
-        <button onClick={() => navigate(`/clases/${courseId}`)} className="text-text-secondary hover:text-primary transition-colors flex items-center gap-2 font-medium">
-          <span>←</span> Volver a la clase
-        </button>
-      </div>
 
-      {/* CABECERA DE LA TAREA */}
-      <div className="bg-surface-white rounded-2xl p-8 border border-gray-100 shadow-sm relative overflow-hidden group">
-        <div className="absolute top-0 left-0 w-full h-2 bg-orange-400"></div>
-       <div className="flex items-center justify-between mb-4">
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-orange-600 bg-orange-50 px-3 py-1 rounded-full">
-              📝 Tarea Asignada
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        {/* COLUMNA IZQUIERDA: Detalles de la Tarea (Ocupa 2/3 en escritorio) */}
+        <div className="lg:col-span-2 flex flex-col gap-6">
+      <div className="mb-2 flex flex-col md:flex-row justify-between items-start gap-4">
+        <div className="flex-1">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="w-10 h-10 rounded-full bg-primary/10 text-primary-dark flex items-center justify-center shrink-0">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
             </span>
-            
-            {/* NUEVO: Insignia del puntaje máximo visible para todos */}
-            {!isEditing && (
-              <span className="text-sm font-bold text-text-secondary flex items-center gap-1 bg-gray-50 px-3 py-1 rounded-full border border-gray-100">
-                ⭐ Valor: {tarea.calificacion || 100} pts
+            <h1 className="text-3xl font-black text-primary-dark leading-tight">{tarea.titulo}</h1>
+          </div>
+          <div className="flex items-center gap-4 text-sm font-medium mt-1">
+            <span className="text-text-secondary">
+              {tarea.nombre_profesor || 'Profesor'} • {new Date(tarea.fecha_creacion || Date.now()).toLocaleDateString()}
+            </span>
+            {tarea.fecha_entrega && (
+              <span className={`font-bold ${isOverdue ? 'text-error' : 'text-primary/70'}`}>
+                Límite: {new Date(tarea.fecha_entrega).toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' })}
               </span>
             )}
-
-            {tarea.fecha_entrega && !isEditing && (
-               <span className={`text-sm font-bold flex items-center gap-1 bg-gray-50 px-3 py-1 rounded-full border border-gray-100 ${isOverdue ? 'text-red-500 border-red-100 bg-red-50' : 'text-text-secondary'}`}>
-                 ⏱️ Vence: {new Date(tarea.fecha_entrega).toLocaleString('es-ES', { dateStyle: 'long', timeStyle: 'short' })}
-               </span>
-            )}
           </div>
-
-          {/* Botones de edición (sin cambios) */}
-          {canManage && !isEditing && (
-            <div className="flex items-center gap-2">
-              <button onClick={() => setIsEditing(true)} className="p-2 text-text-secondary hover:bg-orange-200 transition-colors rounded-lg">✏️</button>
-              <button onClick={handleDelete} className="p-2 text-text-secondary hover:bg-red-300 transition-colors rounded-lg">🗑️</button>
-            </div>
-          )}
         </div>
-          {canManage && !isEditing && (
-          <div className="mt-6 pt-4 border-t border-orange-100 flex justify-end">
-            <button 
-              onClick={() => navigate(`/clases/${courseId}/tarea/${taskId}/revisiones`)}
-              className="inline-flex items-center gap-2 px-6 py-2.5 bg-orange-100 text-orange-700 hover:bg-orange-200 hover:text-orange-800 rounded-xl font-bold transition-colors shadow-sm"
-            >
-              <span>📑</span> Ver Entregas y Calificar
-            </button>
-          </div>
-        )}
-        {isEditing ? (
-          <div className="space-y-4 animate-fade-in border-t border-gray-100 pt-4">
-            <InputField label="Título de la Tarea" type="text" value={editTitulo} onChange={(e) => setEditTitulo(e.target.value)} disabled={isSaving} />
-            
-            {/* NUEVO: Grid para poner Fecha y Nota lado a lado */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <InputField label="Fecha Límite de Entrega" type="datetime-local" min={fechaMinima} value={editFechaEntrega} onChange={(e) => setEditFechaEntrega(e.target.value)} disabled={isSaving} required />
-              
-              <InputField 
-                label="Calificación Máxima" 
-                type="number" 
-                min={1}
-                max={100}
-                value={editCalificacion.toString()} 
-                onChange={(e) => setEditCalificacion(e.target.value ? Number(e.target.value) : '')} 
-                disabled={isSaving} 
-                required 
-              />
+        <div className="flex flex-col items-end gap-2">
+          <div className="flex items-center gap-4">
+             {canManage && (
+              <div className="flex items-center gap-2 mr-2">
+                <button onClick={() => setIsEditing(true)} className="p-2 text-text-secondary hover:text-primary hover:bg-primary/5 rounded-full transition-colors" title="Editar">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                </button>
+                <button onClick={handleDelete} className="p-2 text-text-secondary hover:text-error hover:bg-error/5 rounded-full transition-colors" title="Eliminar">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                </button>
+              </div>
+            )}
+            <div className="text-right">
+              <div className="text-lg font-black text-primary-dark">{tarea.calificacion || 100} puntos</div>
+              {isEstudiante && (
+                <div className={`text-sm font-bold ${isCalificada ? 'text-orange-600' : (tieneEntregaActiva ? 'text-green-500' : 'text-gray-400')}`}>
+                   {isCalificada ? 'Calificado' : (tieneEntregaActiva ? 'Entregado' : 'Asignado')}
+                </div>
+              )}
             </div>
+          </div>
+        </div>
+      </div>
+      <hr className="border-gray-200 mt-2" />
 
-            <div>
-              <label className="block text-sm font-bold text-text-primary mb-1.5">Instrucciones</label>
-              <textarea className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-text-primary text-sm focus:outline-none focus:border-primary/50 transition-colors resize-none h-32" value={editDescripcion} onChange={(e) => setEditDescripcion(e.target.value)} disabled={isSaving} />
-            </div>
-            <div className="flex justify-end gap-3 pt-2">
-              <button 
-                onClick={() => { 
-                  setIsEditing(false); 
-                  setEditTitulo(tarea.titulo); 
-                  setEditDescripcion(tarea.descripcion); 
-                  setEditFechaEntrega(formatForInput(tarea.fecha_entrega));
-                  setEditCalificacion(tarea.calificacion ?? 100); // NUEVO: Resetear al cancelar
-                }} 
-                className="px-4 py-2 text-sm font-bold text-text-secondary hover:text-text-primary" 
-                disabled={isSaving}
-              >
-                Cancelar
-              </button>
-              <div className="w-32"><Button onClick={handleUpdate} isLoading={isSaving}>Guardar</Button></div>
-            </div>
+      {/* MODAL DE EDICIÓN PARA PROFESORES */}
+      <Modal isOpen={isEditing} onClose={() => setIsEditing(false)} title="Editar Tarea">
+        <div className="space-y-4">
+          <InputField label="Título de la Tarea" type="text" value={editTitulo} onChange={(e) => setEditTitulo(e.target.value)} disabled={isSaving} />
+          <div className="grid grid-cols-1 gap-4">
+            <InputField label="Fecha Límite de Entrega" type="datetime-local" min={fechaMinima} value={editFechaEntrega} onChange={(e) => setEditFechaEntrega(e.target.value)} disabled={isSaving} required />
+            <InputField label="Calificación Máxima" type="number" min={1} max={100} value={editCalificacion.toString()} onChange={(e) => setEditCalificacion(e.target.value ? Number(e.target.value) : '')} disabled={isSaving} required />
           </div>
-        ) : (
-          <div className="animate-fade-in mt-2">
-            <h1 className="text-3xl font-extrabold text-primary-dark pr-12">{tarea.titulo}</h1>
-            <p className="text-text-secondary mt-4 text-lg leading-relaxed whitespace-pre-wrap">{tarea.descripcion}</p>
+          <div>
+            <label className="block text-sm font-bold text-text-primary mb-1.5">Instrucciones</label>
+            <textarea className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-text-primary text-sm focus:outline-none focus:border-primary/50 transition-colors resize-none h-32" value={editDescripcion} onChange={(e) => setEditDescripcion(e.target.value)} disabled={isSaving} />
           </div>
-        )}
+          <div className="flex justify-end gap-3 pt-2">
+            <button onClick={() => { setIsEditing(false); setEditTitulo(tarea.titulo); setEditDescripcion(tarea.descripcion); setEditFechaEntrega(formatForInput(tarea.fecha_entrega)); setEditCalificacion(tarea.calificacion ?? 100); }} className="px-4 py-2 text-sm font-bold text-text-secondary hover:text-text-primary" disabled={isSaving}>Cancelar</button>
+            <div className="w-32"><Button onClick={handleUpdate} isLoading={isSaving}>Guardar</Button></div>
+          </div>
+        </div>
+      </Modal>
+
+      <div className="pt-2">
+        <p className="text-text-primary text-base leading-relaxed whitespace-pre-wrap">{tarea.descripcion}</p>
       </div>
 
       {/* ARCHIVOS DE INSTRUCCIONES */}
-      <div className="bg-surface-white rounded-2xl p-8 border border-gray-100 shadow-sm">
-        <h2 className="text-xl font-bold text-text-primary mb-6">Archivos de Instrucciones</h2>
-        <div className="space-y-3">
+      <div>
+        <h2 className="text-xl font-bold text-primary-dark mb-4">Archivos adjuntos</h2>
+        
+        <div className="bg-surface-white rounded-2xl p-4 border border-gray-100 shadow-[0_4px_20px_rgb(0,0,0,0.03)]">
           {archivosDelServidor.length === 0 ? (
-            <p className="text-sm text-text-secondary italic">El profesor no ha adjuntado archivos adicionales.</p>
+            <p className="text-sm text-text-secondary text-center py-4">No hay archivos adjuntos.</p>
           ) : (
-            archivosDelServidor.map((archivo) => (
-              <div key={archivo.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
-                <div className="flex items-center gap-3 min-w-0 pr-4">
-                  <span className="text-2xl flex-shrink-0">📄</span>
-                  <span className="font-medium text-text-primary truncate">{archivo.nombre_archivo || 'Documento adjunto'}</span>
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <a href={archivo.url} target="_blank" rel="noreferrer" className="px-4 py-2 bg-orange-50 text-orange-700 hover:bg-orange-100 rounded-lg text-sm font-bold transition-colors">Descargar</a>
-                  {canManage && <button onClick={() => handleDeleteServerFile(archivo.id)} className="p-2 text-text-secondary hover:text-red-600 rounded-lg">🗑️</button>}
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-        {canManage && (
-          <div className="mt-8 pt-8 border-t border-gray-100">
-            <h3 className="text-sm font-bold text-text-primary mb-4">Añadir archivos de instrucciones</h3>
-            <div className="mb-4">
-              <input type="file" multiple onChange={handleFileSelect} className="block w-full text-sm text-text-secondary file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100 cursor-pointer border border-gray-200 rounded-xl border-dashed bg-gray-50" disabled={isUploading} />
-            </div>
-            {archivosPendientes.length > 0 && (
-              <div className="mb-4 p-4 border border-orange-200 bg-orange-50 rounded-xl">
-                <ul className="space-y-2 mb-4">
-                  {archivosPendientes.map((file, idx) => (
-                    <li key={idx} className="flex justify-between items-center text-sm bg-white p-2 rounded-lg border border-orange-100">
-                      <span className="truncate text-text-primary pr-4">{file.name}</span>
-                      <button onClick={() => removePendingFile(idx)} className="text-red-500 font-bold px-2">✕</button>
-                    </li>
-                  ))}
-                </ul>
-                <div className="flex items-center gap-3">
-                  <div className="flex-1">
-                    <Button onClick={handleUploadFiles} isLoading={isUploading} fullWidth>⬆️ Subir instrucciones al servidor</Button>
+            <div className="space-y-2">
+              {archivosDelServidor.map((archivo) => (
+                <div key={archivo.id} className="flex items-center justify-between p-3 border border-gray-100 rounded-xl bg-gray-50/50 hover:bg-gray-50 transition-colors group">
+                  <div className="flex items-center gap-4 min-w-0 pr-4">
+                    <span className="w-10 h-10 rounded-lg bg-primary/10 text-primary-dark flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" />
+                      </svg>
+                    </span>
+                    <span className="font-bold text-sm text-text-primary truncate group-hover:text-primary transition-colors">{archivo.nombre_archivo || 'Documento adjunto'}</span>
                   </div>
-                  {isUploading && profUploadController && (
-                    <button
-                      onClick={() => {
-                        profUploadController.abort();
-                        setProfCancelMessage('Subida cancelada');
-                        setTimeout(() => setProfCancelMessage(null), 5000);
-                      }}
-                      className="px-3 py-2 bg-white border border-red-200 text-red-600 rounded-xl text-sm font-bold"
-                    >
-                      Cancelar subida
-                    </button>
-                  )}
-                </div>
-                {isUploading && (
-                  <div className="mt-3">
-                    <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                      <div className="bg-orange-500 h-2" style={{ width: `${profUploadProgress}%` }}></div>
-                    </div>
-                    <div className="text-sm text-text-secondary mt-2 font-medium">{profUploadProgress}%</div>
-                  </div>
-                )}
-                {profCancelMessage && (
-                  <div className="mt-3 text-sm text-red-600 font-bold">{profCancelMessage}</div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* --- SECCIÓN: MI TRABAJO (SOLO ESTUDIANTES) --- */}
-      {isEstudiante && (
-        <div className="bg-surface-white rounded-2xl p-8 border border-gray-100 shadow-md relative overflow-hidden">
-          
-          <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
-            <div className="flex items-center gap-3">
-              <h2 className="text-xl font-bold text-text-primary">Mi Trabajo</h2>
-              <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${
-                isCalificada ? 'bg-orange-100 text-orange-700' : (tieneEntregaActiva ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500')
-              }`}>
-                {isCalificada ? '🏅 Calificado' : (tieneEntregaActiva ? '✅ Entregado' : '⏳ Pendiente')}
-              </span>
-            </div>
-            
-            {/* Solo se puede anular si está entregado, no ha vencido, Y NO HA SIDO CALIFICADO */}
-            {tieneEntregaActiva && !isOverdue && !isCalificada && (
-              <button
-                onClick={handleCancelarEntrega}
-                disabled={isSubiendoAlumno}
-                className="px-3 py-1.5 border border-red-200 text-red-600 hover:bg-red-50 text-xs font-bold rounded-xl transition-colors disabled:opacity-50"
-              >
-                Anular Entrega
-              </button>
-            )}
-          </div>
-
-          {/* EL VEREDICTO DEL PROFESOR */}
-          {isCalificada && (
-            <div className="mb-8 p-6 bg-orange-50/50 border border-orange-100 rounded-xl">
-              <h3 className="text-xs font-bold text-orange-600 uppercase tracking-wider mb-4">Calificación del Profesor</h3>
-              <div className="flex flex-col sm:flex-row sm:items-center gap-6">
-                <div className="flex flex-col items-center justify-center p-4 bg-white rounded-xl border border-orange-200 min-w-[120px] shadow-sm">
-                  <span className="text-4xl font-extrabold text-orange-600">{entrega.calificacion}</span>
-                  {/* AQUÍ ESTÁ EL CAMBIO: Extraemos la calificación de la tarea dinámicamente */}
-                  <span className="text-xs font-bold text-text-secondary mt-1">
-                    / {tarea.calificacion || 100} pts
-                  </span>
-                </div>
-                {entrega.comentario_profesor && (
-                  <div className="flex-1 bg-white p-4 rounded-xl border border-gray-100 shadow-sm relative">
-                    <span className="absolute -top-3 left-4 bg-white px-2 text-xl">💬</span>
-                    <p className="text-sm text-text-primary italic mt-1">{entrega.comentario_profesor}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {tieneEntregaActiva && archivosEntrega.length > 0 && (
-            <div className="space-y-3 mb-4">
-              {archivosEntrega.map((archivo) => (
-                <div key={archivo.id} className="flex items-center justify-between p-4 border border-gray-100 rounded-xl bg-gray-50/50">
-                  <div className="flex items-center gap-3 min-w-0 pr-4">
-                    <span className="text-xl">📄</span>
-                    <span className="text-sm font-medium text-text-primary truncate">{archivo.nombre_archivo}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                     <a href={archivo.url} target="_blank" rel="noreferrer" className="px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-bold text-text-primary hover:bg-gray-50 transition-colors">Ver</a>
-                     {/* Se oculta el botón de borrar archivo si ya está calificado */}
-                     {!isOverdue && !isCalificada && (
-                       <button onClick={() => handleEliminarArchivoAlumno(archivo.id_archivo)} className="text-red-400 hover:text-red-600 p-1 transition-colors">✕</button>
-                     )}
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <a href={archivo.url} target="_blank" rel="noreferrer" className="w-10 h-10 flex items-center justify-center bg-transparent text-primary-dark hover:bg-primary/10 rounded-xl transition-colors">
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
+                    </a>
+                    {canManage && (
+                      <button onClick={() => handleDeleteServerFile(archivo.id)} className="w-10 h-10 flex items-center justify-center bg-transparent text-error hover:bg-error/10 rounded-xl transition-colors" title="Eliminar archivo">
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
             </div>
           )}
+        </div>
+        {/* SE MOVIÓ LA GESTIÓN AL PANEL DERECHO */}
+      </div>
+      </div>
 
-          <div className="mt-6 pt-6 border-t border-gray-100">
-            {/* Si ya está calificada, mostramos un mensaje de cierre en vez del form de subida */}
-            {isCalificada ? (
-              <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl text-text-secondary text-sm font-medium text-center">
-                Esta tarea ya fue evaluada. El buzón de entrega está cerrado.
-              </div>
-            ) : isOverdue && !tieneEntregaActiva ? (
-              <div className="p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm font-medium text-center">
-                La fecha límite ha pasado. No puedes realizar entregas.
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {(!tieneEntregaActiva || archivosEntrega.length > 0) && (
-                  <div>
-                    <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">
-                      {tieneEntregaActiva ? 'Adjuntar más archivos a tu entrega' : 'Adjuntar archivos físicos (Opcional)'}
-                    </label>
-                    <input type="file" multiple onChange={handleSelectArchivosAlumno} disabled={isSubiendoAlumno} className="block w-full text-sm text-text-secondary file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary hover:file:text-white cursor-pointer" />
+      {/* COLUMNA DERECHA: Tu trabajo o Panel Profesor (Ocupa 1/3 en escritorio) */}
+      <div className="lg:col-span-1">
+      
+      {/* --- PANEL DEL PROFESOR --- */}
+      {canManage && (
+        <div className="bg-surface-white rounded-2xl p-6 border border-gray-100 shadow-[0_4px_20px_rgb(0,0,0,0.03)] sticky top-6">
+          <h2 className="text-lg font-bold text-primary-dark mb-4 border-b border-gray-100 pb-2">Gestión de Tarea</h2>
+          
+          <Button 
+            onClick={() => navigate(`/clases/${courseId}/tarea/${taskId}/revisiones`)} 
+            fullWidth
+          >
+            Ver Entregas y Calificar
+          </Button>
+
+          <div className="mt-6 pt-4 border-t border-gray-100">
+            <h3 className="text-sm font-bold text-text-primary mb-3">Adjuntar instrucciones</h3>
+            <input 
+              type="file" 
+              multiple 
+              onChange={handleFileSelect} 
+              className="block w-full text-xs text-text-secondary file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary hover:file:text-white cursor-pointer mb-3" 
+              disabled={isProfUploading} 
+            />
+            {archivosPendientes.length > 0 && (
+              <div className="bg-gray-50 p-3 rounded-xl border border-gray-100 mb-3">
+                <ul className="space-y-1 mb-3">
+                  {archivosPendientes.map((file, idx) => (
+                    <li key={idx} className="flex justify-between items-center text-xs">
+                      <span className="truncate pr-2">{file.name}</span>
+                      <button onClick={() => removePendingFile(idx)} className="text-error font-bold">✕</button>
+                    </li>
+                  ))}
+                </ul>
+                <Button onClick={handleUploadFiles} isLoading={isProfUploading} fullWidth>Subir archivos</Button>
+                {isProfUploading && (
+                  <div className="mt-2">
+                    <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                      <div className="bg-primary h-1.5" style={{ width: `${profUploadProgress}%` }}></div>
+                    </div>
                   </div>
                 )}
-
-                {archivosSubirAlumno.length > 0 && (
-                  <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl">
-                    <ul className="space-y-2">
-                      {archivosSubirAlumno.map((file, idx) => (
-                        <li key={idx} className="flex justify-between items-center text-xs text-text-primary">
-                          <span className="truncate pr-4">📄 {file.name}</span>
-                          {!tieneEntregaActiva?
-                            <button onClick={() => setArchivosSubirAlumno(prev => prev.filter((_, i) => i !== idx))} className="text-red-500 font-bold px-1 hover:bg-red-50 rounded">✕s</button>:<>afsd</>}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                <div className="pt-2">
-                  <div className="flex items-center gap-3">
-                    <div className="flex-1">
-                      <Button 
-                        onClick={handleSubmitEntrega} 
-                        isLoading={isSubiendoAlumno} 
-                        fullWidth
-                        disabled={tieneEntregaActiva && archivosSubirAlumno.length === 0}
-                      >
-                        {archivosSubirAlumno.length > 0 
-                          ? `🚀 Entregar con ${archivosSubirAlumno.length} archivo(s)` 
-                          : (tieneEntregaActiva ? '✅ Tarea Entregada' : '✔ Marcar como completada (Sin archivos)')
-                        }
-                      </Button>
-                    </div>
-                    {isSubiendoAlumno && studentUploadController && (
-                      <button
-                        onClick={() => {
-                          studentUploadController.abort();
-                          setStudentCancelMessage('Subida cancelada');
-                          setTimeout(() => setStudentCancelMessage(null), 5000);
-                        }}
-                        className="px-3 py-2 bg-white border border-red-200 text-red-600 rounded-xl text-sm font-bold"
-                      >
-                        Cancelar subida
-                      </button>
-                    )}
-                  </div>
-                  {isSubiendoAlumno && (
-                    <div className="mt-3">
-                      <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                        <div className="bg-green-500 h-2" style={{ width: `${studentUploadProgress}%` }}></div>
-                      </div>
-                      <div className="text-sm text-text-secondary mt-2 font-medium">{studentUploadProgress}%</div>
-                    </div>
-                  )}
-                  {studentCancelMessage && (
-                    <div className="mt-3 text-sm text-red-600 font-bold">{studentCancelMessage}</div>
-                  )}
-                </div>
               </div>
             )}
           </div>
         </div>
       )}
+      {/* --- SECCIÓN: MI TRABAJO (SOLO ESTUDIANTES) --- */}
+      {isEstudiante && (
+        <div className="mt-4">
+          <h2 className="text-xl font-bold text-primary-dark mb-4">Tu trabajo</h2>
+          
+          <div className="bg-surface-white rounded-2xl p-6 border border-gray-100 shadow-[0_4px_20px_rgb(0,0,0,0.03)]">
+            {/* EL VEREDICTO DEL PROFESOR */}
+            {isCalificada && (
+              <div className="mb-6 p-4 bg-primary/5 rounded-xl text-center border border-primary/20">
+                <p className="text-primary-dark font-black text-2xl">{entrega.calificacion} / {tarea.calificacion || 100}</p>
+                {entrega.comentario_profesor && (
+                  <p className="text-sm text-text-primary mt-2 italic">"{entrega.comentario_profesor}"</p>
+                )}
+              </div>
+            )}
+
+            <div className="space-y-4">
+              {/* ZONA DE SUBIDA */}
+              {(!isCalificada && (!isOverdue || tieneEntregaActiva)) && (
+                <div className="relative border-2 border-dashed border-gray-200 rounded-2xl p-6 text-center hover:bg-gray-50 transition-colors group">
+                  <input type="file" multiple onChange={handleSelectArchivosAlumno} disabled={isSubiendoAlumno} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                  <div className="w-16 h-16 rounded-full bg-blue-50 mx-auto flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+                    <svg className="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                  </div>
+                  <p className="text-sm text-text-secondary font-medium">Toca para subir un archivo</p>
+                </div>
+              )}
+
+              {/* LISTA DE ARCHIVOS PENDIENTES */}
+              {archivosSubirAlumno.length > 0 && (
+                <div className="space-y-2 mt-4">
+                  {archivosSubirAlumno.map((file, idx) => (
+                    <div key={idx} className="flex justify-between items-center text-sm bg-gray-50 p-3 rounded-xl border border-gray-100">
+                      <span className="truncate text-text-primary font-medium pr-4">{file.name}</span>
+                      <button onClick={() => setArchivosSubirAlumno(prev => prev.filter((_, i) => i !== idx))} className="text-text-secondary hover:text-error transition-colors px-1">✕</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* LISTA DE ARCHIVOS YA ENTREGADOS */}
+              {archivosEntrega.length > 0 && (
+                <div className="mt-6">
+                  <h3 className="text-sm font-bold text-primary-dark mb-3">Archivos entregados</h3>
+                  <div className="space-y-2">
+                    {archivosEntrega.map((archivo) => (
+                      <div key={archivo.id} className="flex items-center justify-between p-3 border border-gray-100 rounded-xl bg-gray-50/50">
+                        <span className="text-sm font-medium text-text-primary truncate">{archivo.nombre_archivo}</span>
+                        <div className="flex items-center gap-2">
+                           <a href={archivo.url} target="_blank" rel="noreferrer" className="text-primary hover:text-primary-dark text-sm font-bold">Ver</a>
+                           {!isOverdue && !isCalificada && (
+                             <button onClick={() => handleEliminarArchivoAlumno(archivo.id_archivo)} className="text-error/70 hover:text-error ml-2 transition-colors">✕</button>
+                           )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {tieneEntregaActiva && archivosEntrega.length === 0 && (
+                <div className="mt-6">
+                  <h3 className="text-sm font-bold text-primary-dark mb-1">Archivos entregados</h3>
+                  <p className="text-xs text-text-secondary">Entregado sin archivos adjuntos</p>
+                </div>
+              )}
+
+              {/* BOTONES PRINCIPALES */}
+              <div className="pt-4 flex flex-col md:flex-row gap-3">
+                {tieneEntregaActiva && !isOverdue && !isCalificada && (
+                  <button
+                    onClick={handleCancelarEntrega}
+                    disabled={isSubiendoAlumno}
+                    className="flex-1 py-3.5 bg-error text-white font-bold rounded-xl shadow-sm hover:bg-red-600 transition-colors"
+                  >
+                    Anular entrega
+                  </button>
+                )}
+                
+                {(!isCalificada && (!isOverdue || tieneEntregaActiva)) && (
+                   <button
+                    onClick={handleSubmitEntrega}
+                    disabled={isSubiendoAlumno || (tieneEntregaActiva && archivosSubirAlumno.length === 0)}
+                    className="flex-1 py-3.5 bg-primary-dark text-white font-bold rounded-xl shadow-sm hover:bg-primary transition-colors disabled:opacity-50"
+                  >
+                    {isSubiendoAlumno ? 'Subiendo...' : (tieneEntregaActiva ? (archivosSubirAlumno.length > 0 ? 'Entregar nuevos archivos' : 'Reentregar tarea') : 'Entregar tarea')}
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      </div>
     </div>
+  </div>
   );
 };
